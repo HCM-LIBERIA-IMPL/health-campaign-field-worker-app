@@ -73,6 +73,8 @@ class StatusMapper extends EnumMapper<Status> {
         return "IN_COMPLETE";
       case Status.toAdminister:
         return "TO_ADMINISTER";
+      case Status.beneficiaryIneligible:
+        return "BENEFICIARY_INELIGIBLE";
     }
   }
 }

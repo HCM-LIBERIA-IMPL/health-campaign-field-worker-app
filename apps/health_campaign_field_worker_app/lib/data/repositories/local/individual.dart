@@ -48,20 +48,20 @@ class IndividualLocalRepository extends IndividualLocalBaseRepository {
                   query.clientReferenceId!,
                 ),
               if (query.id != null)
-                sql.individual.id.equals(
-                  query.id,
+                sql.individual.id.isIn(
+                  query.id!,
                 ),
               if (query.tenantId != null)
                 sql.individual.tenantId.equals(
-                  query.tenantId,
+                  query.tenantId!,
                 ),
               if (query.dateOfBirth != null)
                 sql.individual.dateOfBirth.equals(
-                  query.dateOfBirth,
+                  query.dateOfBirth!,
                 ),
               if (query.gender != null)
                 sql.individual.gender.equals(
-                  query.gender?.index,
+                  query.gender!.index,
                 ),
               if (query.name?.givenName != null)
                 sql.name.givenName.contains(
@@ -73,7 +73,7 @@ class IndividualLocalRepository extends IndividualLocalBaseRepository {
                 ),
               if (query.name?.otherNames != null)
                 sql.name.otherNames.equals(
-                  query.name!.otherNames,
+                  query.name!.otherNames!,
                 ),
               if (userId != null)
                 sql.individual.auditCreatedBy.equals(
@@ -370,7 +370,7 @@ class IndividualLocalRepository extends IndividualLocalBaseRepository {
           sql.name,
           nameCompanion,
           where: (table) => table.individualClientReferenceId.equals(
-            nameCompanion.individualClientReferenceId.value,
+            nameCompanion.individualClientReferenceId.value!,
           ),
         );
       }
