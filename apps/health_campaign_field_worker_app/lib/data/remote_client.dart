@@ -2,6 +2,8 @@
 import "package:dio/dio.dart"; // Dio package for HTTP requests
 import '../utils/environment_config.dart'; // Custom utility file for environment configurations
 import 'repositories/api_interceptors.dart'; // Custom API interceptors for Dio
+import 'dart:io';
+import 'package:dio/io.dart';
 
 // The DioClient class for managing the Dio instance
 class DioClient {
@@ -43,5 +45,24 @@ class DioClient {
         baseUrl: envConfig.variables
             .baseUrl, // Base URL for API endpoints from the environment configuration
       );
+
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      // config the http client
+      client.findProxy = (uri) {
+        //proxy all request to localhost:8888
+        return "PROXY 192.168.5.146:8888";
+      };
+
+      client.badCertificateCallback = ((
+        X509Certificate cert,
+        String host,
+        int port,
+      ) =>
+          // TODO Disable in release mode
+          true);
+
+      return client;
+    };
   }
 }
