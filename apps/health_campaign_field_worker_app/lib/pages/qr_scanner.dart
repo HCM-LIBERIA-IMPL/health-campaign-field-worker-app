@@ -234,8 +234,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                               onPressed: () async {
                                 if (widget.isGS1code &&
                                     result.length < widget.quantity) {
-                                  // buildDialog();
-                                  context.router.pop();
+                                  buildDialog();
                                 } else {
                                   final bloc =
                                       context.read<SearchHouseholdsBloc>();
@@ -246,7 +245,8 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                                   if (scannerState.qrcodes.isNotEmpty) {
                                     bloc.add(
                                       SearchHouseholdsEvent.searchByTag(
-                                        tag: scannerState.qrcodes.first,
+                                        tag: scannerState.qrcodes.first
+                                            .replaceAll(' ', ''),
                                         projectId: context.projectId,
                                       ),
                                     );
@@ -298,7 +298,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                                   width: MediaQuery.of(context).size.width,
                                   child: widget.isGS1code
                                       ? Text(
-                                          '${state.barcodes.length.toString()} ${localizations.translate(i18.deliverIntervention.resourcesScanned)}',
+                                          '${state.barcodes.length.toString()} ${localizations.translate(i18.stockDetails.balesScanned)}',
                                           style: theme.textTheme.headlineMedium,
                                         )
                                       : Text(
@@ -440,30 +440,32 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                             i18.common.coreCommonSubmit,
                           )),
                           onPressed: () async {
-                            if (!widget.isGS1code) {
-                              if (!pattern.hasMatch(
-                                _resourceController.value.text,
-                              )) {
-                                await handleError(
-                                  i18.deliverIntervention.scanValidResource,
-                                );
+                            String code = _resourceController.value.text
+                                .replaceAll(' ', '');
+                            // if (!widget.isGS1code) {
+                            //   if (!pattern.hasMatch(
+                            //     code,
+                            //   )) {
+                            //     await handleError(
+                            //       i18.deliverIntervention.scanValidResource,
+                            //     );
 
-                                return;
-                              } else {
-                                bool isLimiteExceeded = await isLimitExceeded(
-                                  _resourceController.value.text,
-                                );
-                                if (isLimiteExceeded) {
-                                  await handleError(
-                                    i18.deliverIntervention.scanValidResource,
-                                  );
+                            //     return;
+                            //   } else {
+                            //     bool isLimiteExceeded = await isLimitExceeded(
+                            //       code,
+                            //     );
+                            //     if (isLimiteExceeded) {
+                            //       await handleError(
+                            //         i18.deliverIntervention.scanValidResource,
+                            //       );
 
-                                  return;
-                                }
-                              }
-                            }
+                            //       return;
+                            //     }
+                            //   }
+                            // }
                             final bloc = context.read<ScannerBloc>();
-                            codes.add(_resourceController.value.text);
+                            codes.add(code);
                             bloc.add(
                               ScannerEvent.handleScanner(
                                 state.barcodes,
@@ -471,7 +473,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                               ),
                             );
                             if (widget.isGS1code) {
-                              // buildDialog();
+                              buildDialog();
                             } else {
                               final bloc = context.read<SearchHouseholdsBloc>();
                               final scannerState =
@@ -481,8 +483,9 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
                                   manualcode) {
                                 bloc.add(SearchHouseholdsEvent.searchByTag(
                                   tag: manualcode
-                                      ? _resourceController.value.text
-                                      : scannerState.qrcodes.first,
+                                      ? code
+                                      : scannerState.qrcodes.first
+                                          .replaceAll(' ', ''),
                                   projectId: context.projectId,
                                 ));
                               }
@@ -588,36 +591,45 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
             //     element.elements.entries.last.value.data ==
             //     parsedResult.elements.entries.last.value.data);
 
-            await storeValue(parsedResult);
+            if (widget.quantity > result.length) {
+              await storeValue(parsedResult);
+            } else {
+              await handleError(
+                i18.deliverIntervention.scannedResourceCountMisMatch,
+              );
+            }
           } catch (e) {
             await handleError(
               i18.deliverIntervention.scanValidResource,
             );
           }
         } else {
-          if (bloc.state.qrcodes.contains(barcodes.first.displayValue)) {
+          String code = (barcodes.first.displayValue ?? "").replaceAll(' ', '');
+          if (bloc.state.qrcodes.contains(code)) {
             await handleError(
               i18.deliverIntervention.resourceAlreadyScanned,
             );
 
             return;
           } else {
-            if (pattern.hasMatch(barcodes.first.displayValue ?? "")) {
-              bool isLimiteExceeded = await isLimitExceeded(
-                barcodes.first.displayValue.toString(),
-              );
-              if (isLimiteExceeded) {
-                await handleError(
-                  i18.deliverIntervention.scanValidResource,
-                );
-              } else {
-                await storeCode(barcodes.first.displayValue.toString());
-              }
-            } else {
-              await handleError(
-                i18.deliverIntervention.scanValidResource,
-              );
-            }
+            // if (pattern.hasMatch(
+            //   code,
+            // )) {
+            //   bool isLimiteExceeded = await isLimitExceeded(
+            //     code,
+            //   );
+            //   if (isLimiteExceeded) {
+            //     await handleError(
+            //       i18.deliverIntervention.scanValidResource,
+            //     );
+            //   } else {
+            await storeCode(code);
+            //   }
+            // } else {
+            //   await handleError(
+            //     i18.deliverIntervention.scanValidResource,
+            //   );
+            // }
           }
         }
       }

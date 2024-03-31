@@ -415,8 +415,12 @@ class _ChecklistViewPageState extends LocalizedState<ChecklistViewPage> {
                                                       ? controller[i]
                                                           .text
                                                           .toString()
-                                                      : i18.checklist
-                                                          .notSelectedKey
+                                                      : (attribute?[i]
+                                                                  .dataType !=
+                                                              'Number'
+                                                          ? i18.checklist
+                                                              .notSelectedKey
+                                                          : '0')
                                                   : visibleChecklistIndexes
                                                           .contains(i)
                                                       ? controller[i]

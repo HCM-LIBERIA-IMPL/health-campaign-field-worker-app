@@ -68,6 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
       }
     } catch (_) {
+      localSecureStore.deleteAll();
       emit(const AuthUnauthenticatedState());
       rethrow;
     }
