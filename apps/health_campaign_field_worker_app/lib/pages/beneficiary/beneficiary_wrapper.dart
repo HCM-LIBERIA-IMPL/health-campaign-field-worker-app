@@ -16,13 +16,11 @@ import '../../utils/extensions/extensions.dart';
 class BeneficiaryWrapperPage extends StatelessWidget {
   final HouseholdMemberWrapper wrapper;
   final bool isEditing;
-  final int? startTime;
 
   const BeneficiaryWrapperPage({
     Key? key,
     required this.wrapper,
     this.isEditing = false,
-    this.startTime,
   }) : super(key: key);
 
   @override
@@ -50,7 +48,6 @@ class BeneficiaryWrapperPage extends StatelessWidget {
     final projectFacilityRepository =
         context.repository<ProjectFacilityModel, ProjectFacilitySearchModel>();
     final referral = context.repository<ReferralModel, ReferralSearchModel>();
-    final stockRepository = context.repository<StockModel, StockSearchModel>();
 
     return MultiBlocProvider(
       providers: [
@@ -64,11 +61,9 @@ class BeneficiaryWrapperPage extends StatelessWidget {
           create: (_) => FacilityBloc(
             facilityDataRepository: facilityRepository,
             projectFacilityDataRepository: projectFacilityRepository,
-            stockRepository: stockRepository,
           )..add(
               FacilityLoadForProjectEvent(
                 projectId: context.selectedProject.id,
-                userId: context.loggedInUserUuid,
               ),
             ),
         ),
@@ -95,7 +90,6 @@ class BeneficiaryWrapperPage extends StatelessWidget {
         BlocProvider(
           create: (_) => DeliverInterventionBloc(
             DeliverInterventionState(
-              startTime: startTime,
               isEditing: isEditing,
             ),
             taskRepository: task,
@@ -124,7 +118,6 @@ class BeneficiaryWrapperPage extends StatelessWidget {
             lazy: false,
             create: (_) => DeliverInterventionBloc(
               DeliverInterventionState(
-                startTime: startTime,
                 isEditing: isEditing,
               ),
               taskRepository: task,

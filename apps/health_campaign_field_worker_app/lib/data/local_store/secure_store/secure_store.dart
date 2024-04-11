@@ -12,14 +12,12 @@ class LocalSecureStore {
   static const refreshTokenKey = 'refreshTokenKey';
   static const userObjectKey = 'userObject';
   static const selectedProjectKey = 'selectedProject';
-  static const selectedIndividualKey = 'selectedIndividual';
   static const hasAppRunBeforeKey = 'hasAppRunBefore';
   static const backgroundServiceKey = 'backgroundServiceKey';
   static const boundaryRefetchInKey = 'boundaryRefetchInKey';
   static const actionsListkey = 'actionsListkey';
   static const isAppInActiveKey = 'isAppInActiveKey';
   static const manualSyncKey = 'manualSyncKey';
-  static const isSyncRunningKey = 'isSyncRunningKey';
   static const selectedProjectTypeKey = 'selectedProjectType';
 
   final storage = const FlutterSecureStorage();
@@ -29,12 +27,12 @@ class LocalSecureStore {
 
   LocalSecureStore._();
 
-  Future<String?> get accessToken async {
-    return await storage.read(key: accessTokenKey);
+  Future<String?> get accessToken {
+    return storage.read(key: accessTokenKey);
   }
 
-  Future<String?> get refreshToken async {
-    return await storage.read(key: refreshTokenKey);
+  Future<String?> get refreshToken {
+    return storage.read(key: refreshTokenKey);
   }
 
   Future<bool> get isBackgroundSerivceRunning async {
@@ -61,25 +59,12 @@ class LocalSecureStore {
     }
   }
 
-  Future<String?> get userIndividualId async {
-    final individualId = await storage.read(key: selectedIndividualKey);
-    if (individualId == null) return null;
-
-    try {
-      final user = individualId;
-
-      return user;
-    } catch (_) {
-      return null;
-    }
-  }
-
   Future<ProjectModel?> get selectedProject async {
     final projectString = await storage.read(key: selectedProjectKey);
     if (projectString == null) return null;
 
     try {
-      final project = ProjectModelMapper.fromMap(json.decode(projectString));
+      final project = Mapper.fromMap<ProjectModel>(json.decode(projectString));
 
       return project;
     } catch (_) {
@@ -115,17 +100,6 @@ class LocalSecureStore {
     final hasRun = await storage.read(key: manualSyncKey);
 
     switch (hasRun) {
-      case 'true':
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  Future<bool> get isSyncRunning async {
-    final isSyncRunning = await storage.read(key: isSyncRunningKey);
-
-    switch (isSyncRunning) {
       case 'true':
         return true;
       default:
@@ -181,17 +155,6 @@ class LocalSecureStore {
     );
   }
 
-  Future<void> setSyncRunning(bool isSyncRunning) async {
-    await storage.write(
-      key: isSyncRunningKey,
-      value: isSyncRunning.toString(),
-    );
-  }
-
-  Future<void> setRoleActions(String actions) async {
-    await storage.write(key: actionsListkey, value: actions);
-  }
-
   Future<void> setAuthCredentials(AuthModel model) async {
     await storage.write(key: accessTokenKey, value: model.accessToken);
     await storage.write(key: refreshTokenKey, value: model.refreshToken);
@@ -205,6 +168,13 @@ class LocalSecureStore {
     await storage.write(
       key: boundaryRefetchInKey,
       value: isboundaryRefetch.toString(),
+    );
+  }
+
+  Future<void> setRoleActions(RoleActionsWrapperModel actions) async {
+    await storage.write(
+      key: actionsListkey,
+      value: json.encode(actions),
     );
   }
 

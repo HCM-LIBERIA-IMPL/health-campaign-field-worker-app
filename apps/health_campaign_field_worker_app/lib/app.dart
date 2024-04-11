@@ -1,8 +1,3 @@
-import 'dart:math';
-
-import 'package:attendance_management/blocs/app_localization.dart'
-    as attendance_localization;
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -94,12 +89,7 @@ class MainApplicationState extends State<MainApplication>
               BlocProvider(
                 create: (ctx) => AuthBloc(
                   authRepository: ctx.read(),
-                  boundaryLocalRepository: ctx.read<
-                      LocalRepository<BoundaryModel, BoundarySearchModel>>(),
                   mdmsRepository: MdmsRepository(widget.client),
-                  individualRemoteRepository: ctx.read<
-                      RemoteRepository<IndividualModel,
-                          IndividualSearchModel>>(),
                 )..add(
                     AuthAutoLoginEvent(
                       tenantId: envConfig.variables.tenantId,
@@ -113,6 +103,9 @@ class MainApplicationState extends State<MainApplication>
                       .read<NetworkManager>()
                       .repository<ProjectBeneficiaryModel,
                           ProjectBeneficiarySearchModel>(ctx),
+                  hfReferralDataRepository: ctx
+                      .read<NetworkManager>()
+                      .repository<HFReferralModel, HFReferralSearchModel>(ctx),
                 ),
               ),
               BlocProvider(
@@ -126,7 +119,7 @@ class MainApplicationState extends State<MainApplication>
             ],
             child: BlocBuilder<AppInitializationBloc, AppInitializationState>(
               builder: (context, appConfigState) {
-                const defaultLocale = Locale('en', 'LB');
+                const defaultLocale = Locale('en', 'IN');
 
                 return BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, authState) {
@@ -234,83 +227,30 @@ class MainApplicationState extends State<MainApplication>
                             projectResourceRemoteRepository: ctx.read<
                                 RemoteRepository<ProjectResourceModel,
                                     ProjectResourceSearchModel>>(),
-                            attendanceLocalRepository: ctx.read<
-                                LocalRepository<HCMAttendanceRegisterModel,
-                                    HCMAttendanceSearchModel>>(),
-                            attendanceRemoteRepository: ctx.read<
-                                RemoteRepository<HCMAttendanceRegisterModel,
-                                    HCMAttendanceSearchModel>>(),
-                            individualLocalRepository: ctx.read<
-                                LocalRepository<IndividualModel,
-                                    IndividualSearchModel>>(),
-                            individualRemoteRepository: ctx.read<
-                                RemoteRepository<IndividualModel,
-                                    IndividualSearchModel>>(),
-                            attendanceLogLocalRepository: ctx.read<
-                                LocalRepository<HCMAttendanceLogModel,
-                                    HCMAttendanceLogSearchModel>>(),
-                            attendanceLogRemoteRepository: ctx.read<
-                                RemoteRepository<HCMAttendanceLogModel,
-                                    HCMAttendanceLogSearchModel>>(),
-                            context: context,
                           ),
                         ),
                       ],
                       child: BlocBuilder<LocalizationBloc, LocalizationState>(
                         builder: (context, langState) {
+                          final selectedLocale =
+                              AppSharedPreferences().getSelectedLocale;
+
                           return MaterialApp.router(
                             debugShowCheckedModeBanner: false,
                             builder: (context, child) {
-                              if (child == null) {
-                                return const SizedBox.shrink();
-                              }
-
                               final env = envConfig.variables.envType;
                               if (env == EnvType.prod) {
-                                return child;
-                              }
-
-                              if (env == EnvType.training) {
-                                return Scaffold(
-                                  body: Stack(
-                                    children: [
-                                      Positioned.fill(child: child),
-                                      Positioned.fill(
-                                        child: IgnorePointer(
-                                          child: Transform.rotate(
-                                            angle: -pi / 4,
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Center(
-                                                child: AutoSizeText(
-                                                  'Training'.toUpperCase(),
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                    fontSize: 50,
-                                                    color: Colors.black
-                                                        .withAlpha(25),
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                return child ?? const SizedBox.shrink();
                               }
 
                               return Banner(
                                 message: envConfig.variables.envType.name,
-                                location: BannerLocation.topStart,
+                                location: BannerLocation.topEnd,
                                 color: () {
                                   switch (envConfig.variables.envType) {
-                                    case EnvType.training:
-                                      return Colors.green;
                                     case EnvType.uat:
+                                      return Colors.green;
+                                    case EnvType.qa:
                                       return Colors.pink;
                                     default:
                                       return Colors.red;
@@ -321,7 +261,11 @@ class MainApplicationState extends State<MainApplication>
                             },
                             supportedLocales: languages != null
                                 ? languages.map((e) {
-                                    return defaultLocale;
+                                    final results = e.value.split('_');
+
+                                    return results.isNotEmpty
+                                        ? Locale(results.first, results.last)
+                                        : defaultLocale;
                                   })
                                 : [defaultLocale],
                             localizationsDelegates: [
@@ -332,25 +276,11 @@ class MainApplicationState extends State<MainApplication>
                               GlobalWidgetsLocalizations.delegate,
                               GlobalCupertinoLocalizations.delegate,
                               GlobalMaterialLocalizations.delegate,
-                              attendance_localization.AttendanceLocalization
-                                  .getDelegate(
-                                getLocalizationString(
-                                  widget.isar,
-                                  defaultLocale.toString(),
-                                ),
-                                appConfig.languages!,
-                              ),
                             ],
                             locale: languages != null
                                 ? Locale(
-                                    languages[langState.index]
-                                        .value
-                                        .split('_')
-                                        .first,
-                                    languages[langState.index]
-                                        .value
-                                        .split('_')
-                                        .last,
+                                    selectedLocale.split("_").first,
+                                    selectedLocale.split("_").last,
                                   )
                                 : defaultLocale,
                             theme: DigitTheme.instance.mobileTheme,
@@ -364,7 +294,7 @@ class MainApplicationState extends State<MainApplication>
                                 orElse: () => [
                                   const UnauthenticatedRouteWrapper(),
                                 ],
-                                authenticated: (_, __, ___, ____, _____) => [
+                                authenticated: (_, __, ___, ____) => [
                                   AuthenticatedRouteWrapper(),
                                 ],
                               ),

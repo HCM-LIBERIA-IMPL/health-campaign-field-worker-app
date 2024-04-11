@@ -142,6 +142,7 @@ class PgrServiceModel extends EntityModel with PgrServiceModelMappable {
   final int rowVersion;
   final PgrAddressModel address;
   final String? additionalDetail;
+  final ClientAuditDetails clientAuditDetails;
 
 
   const PgrServiceModel( {
@@ -160,6 +161,7 @@ class PgrServiceModel extends EntityModel with PgrServiceModelMappable {
     this.rowVersion = 1,
     required this.address,
     this.additionalDetail,
+    required this.clientAuditDetails,
     super.auditDetails,
 
   }) : super(isDeleted: false);

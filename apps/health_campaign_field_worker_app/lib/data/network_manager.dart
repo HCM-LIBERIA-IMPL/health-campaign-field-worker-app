@@ -45,39 +45,6 @@ class NetworkManager {
       throw Exception('Sync up is not valid for online only configuration');
     }
     bool isSyncCompleted = false;
-    SyncError? syncError;
-
-    await LocalSecureStore.instance.setSyncRunning(true);
-
-// Perform the sync Down Operation
-
-    try {
-      await PerformSyncDown.syncDown(
-        bandwidthModel: bandwidthModel,
-        localRepositories: localRepositories.toSet().toList(),
-        remoteRepositories: remoteRepositories.toSet().toList(),
-        configuration: configuration,
-      );
-    } catch (e) {
-      syncError = SyncDownError(e);
-    }
-
-// Perform the sync up Operation
-
-    try {
-      await PerformSyncUp.syncUp(
-        bandwidthModel: bandwidthModel,
-        localRepositories: localRepositories.toSet().toList(),
-        remoteRepositories: remoteRepositories.toSet().toList(),
-      );
-    } catch (e) {
-      syncError ??= SyncUpError(e);
-    }
-
-    if (syncError != null) {
-      await LocalSecureStore.instance.setSyncRunning(false);
-      throw syncError;
-    }
 
     final futuresSyncDown = await Future.wait(
       localRepositories
@@ -91,6 +58,37 @@ class NetworkManager {
     );
     final pendingSyncUpEntries = futuresSyncUp.expand((e) => e).toList();
 
+    SyncError? syncError;
+
+// Perform the sync Down Operation
+
+    try {
+      await PerformSyncDown.syncDown(
+        bandwidthModel: bandwidthModel,
+        localRepositories: localRepositories.toSet().toList(),
+        remoteRepositories: remoteRepositories.toSet().toList(),
+        configuration: configuration,
+      );
+    } catch (e) {
+      syncError = SyncDownError(e);
+      service?.stopSelf();
+    }
+
+// Perform the sync up Operation
+
+    try {
+      await PerformSyncUp.syncUp(
+        bandwidthModel: bandwidthModel,
+        localRepositories: localRepositories.toSet().toList(),
+        remoteRepositories: remoteRepositories.toSet().toList(),
+      );
+    } catch (e) {
+      syncError ??= SyncUpError(e);
+      service?.stopSelf();
+    }
+
+    if (syncError != null) throw syncError;
+
     // Recursive function which will call the Perfom Sync
 
     if (pendingSyncUpEntries.isNotEmpty || pendingSyncDownEntries.isNotEmpty) {
@@ -102,7 +100,6 @@ class NetworkManager {
       );
     } else if (pendingSyncUpEntries.isEmpty && pendingSyncDownEntries.isEmpty) {
       await LocalSecureStore.instance.setManualSyncTrigger(false);
-      await LocalSecureStore.instance.setSyncRunning(false);
       isSyncCompleted = true;
     }
 
@@ -130,47 +127,45 @@ class NetworkManager {
           switch (response.keys.elementAt(i)) {
             case "Households":
               final entity = entityList
-                  .map((e) => HouseholdModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<HouseholdModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             case "HouseholdMembers":
               final entity = entityList
                   .map(
-                    (e) => HouseholdMemberModelMapper.fromJson(
-                      jsonEncode(e),
-                    ),
+                    (e) => Mapper.fromJson<HouseholdMemberModel>(jsonEncode(e)),
                   )
                   .toList();
               await local.bulkCreate(entity);
             case "Individuals":
               final entity = entityList
-                  .map((e) => IndividualModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<IndividualModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             case "ProjectBeneficiaries":
               final entity = entityList
                   .map((e) =>
-                      ProjectBeneficiaryModelMapper.fromJson(jsonEncode(e)))
+                      Mapper.fromJson<ProjectBeneficiaryModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             case "Tasks":
               final entity = entityList
-                  .map((e) => TaskModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<TaskModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             case "SideEffects":
               final entity = entityList
-                  .map((e) => SideEffectModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<SideEffectModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             case "Referrals":
               final entity = entityList
-                  .map((e) => ReferralModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<ReferralModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
             default:
               final entity = entityList
-                  .map((e) => EntityModelMapper.fromJson(jsonEncode(e)))
+                  .map((e) => Mapper.fromJson<EntityModel>(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
           }

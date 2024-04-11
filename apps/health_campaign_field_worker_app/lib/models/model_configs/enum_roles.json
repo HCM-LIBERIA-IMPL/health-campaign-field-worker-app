@@ -10,19 +10,8 @@
       "value": "DISTRIBUTOR"
     },
     {
-      "name": "Registrar",
-      "value": "REGISTRAR"
-      
-    },
-    {
-      "name": "Supervisor",
-      "value": "SUPERVISOR"
-      
-    },
-    {
-      "name": "National Supervisor",
-      "value": "NATIONAL_SUPERVISOR"
-      
+      "name": "Health Facility Worker",
+      "value": "HEALTH_FACILITY_WORKER"
     }
   ],
   "isEnum": true

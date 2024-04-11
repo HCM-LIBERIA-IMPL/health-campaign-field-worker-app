@@ -8,7 +8,6 @@ import '../../../models/data_model.dart';
 import '../../../utils/environment_config.dart';
 import '../../data_repository.dart';
 import '../oplog/oplog.dart';
-import '../../local_store/no_sql/schema/oplog.dart' hide AdditionalId;
 import '../remote/pgr_service.dart';
 import 'remote_type.dart';
 
@@ -131,6 +130,12 @@ class PerformSyncUp {
                   address: updatedEntity.address?.copyWith(
                     id: updatedEntity.address?.id ?? addressId,
                   ),
+                );
+              }
+
+              if (updatedEntity is HFReferralModel) {
+                updatedEntity = updatedEntity.copyWith(
+                  id: serverGeneratedId,
                 );
               }
 

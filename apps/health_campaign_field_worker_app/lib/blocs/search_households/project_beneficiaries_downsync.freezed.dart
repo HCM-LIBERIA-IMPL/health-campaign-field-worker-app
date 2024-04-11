@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'project_beneficiaries_downsync.dart';
 
@@ -12,7 +12,7 @@ part of 'project_beneficiaries_downsync.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$BeneficiaryDownSyncEvent {
@@ -116,11 +116,10 @@ class _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$DownSyncBeneficiaryEventImplCopyWith<$Res> {
-  factory _$$DownSyncBeneficiaryEventImplCopyWith(
-          _$DownSyncBeneficiaryEventImpl value,
-          $Res Function(_$DownSyncBeneficiaryEventImpl) then) =
-      __$$DownSyncBeneficiaryEventImplCopyWithImpl<$Res>;
+abstract class _$$DownSyncBeneficiaryEventCopyWith<$Res> {
+  factory _$$DownSyncBeneficiaryEventCopyWith(_$DownSyncBeneficiaryEvent value,
+          $Res Function(_$DownSyncBeneficiaryEvent) then) =
+      __$$DownSyncBeneficiaryEventCopyWithImpl<$Res>;
   @useResult
   $Res call(
       {String projectId,
@@ -131,13 +130,12 @@ abstract class _$$DownSyncBeneficiaryEventImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$DownSyncBeneficiaryEventImplCopyWithImpl<$Res>
+class __$$DownSyncBeneficiaryEventCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
-        _$DownSyncBeneficiaryEventImpl>
-    implements _$$DownSyncBeneficiaryEventImplCopyWith<$Res> {
-  __$$DownSyncBeneficiaryEventImplCopyWithImpl(
-      _$DownSyncBeneficiaryEventImpl _value,
-      $Res Function(_$DownSyncBeneficiaryEventImpl) _then)
+        _$DownSyncBeneficiaryEvent>
+    implements _$$DownSyncBeneficiaryEventCopyWith<$Res> {
+  __$$DownSyncBeneficiaryEventCopyWithImpl(_$DownSyncBeneficiaryEvent _value,
+      $Res Function(_$DownSyncBeneficiaryEvent) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -149,7 +147,7 @@ class __$$DownSyncBeneficiaryEventImplCopyWithImpl<$Res>
     Object? initialServerCount = null,
     Object? boundaryName = null,
   }) {
-    return _then(_$DownSyncBeneficiaryEventImpl(
+    return _then(_$DownSyncBeneficiaryEvent(
       projectId: null == projectId
           ? _value.projectId
           : projectId // ignore: cast_nullable_to_non_nullable
@@ -176,8 +174,8 @@ class __$$DownSyncBeneficiaryEventImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncBeneficiaryEventImpl implements DownSyncBeneficiaryEvent {
-  const _$DownSyncBeneficiaryEventImpl(
+class _$DownSyncBeneficiaryEvent implements DownSyncBeneficiaryEvent {
+  const _$DownSyncBeneficiaryEvent(
       {required this.projectId,
       required this.boundaryCode,
       required this.batchSize,
@@ -201,10 +199,10 @@ class _$DownSyncBeneficiaryEventImpl implements DownSyncBeneficiaryEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncBeneficiaryEventImpl &&
+            other is _$DownSyncBeneficiaryEvent &&
             (identical(other.projectId, projectId) ||
                 other.projectId == projectId) &&
             (identical(other.boundaryCode, boundaryCode) ||
@@ -224,9 +222,10 @@ class _$DownSyncBeneficiaryEventImpl implements DownSyncBeneficiaryEvent {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncBeneficiaryEventImplCopyWith<_$DownSyncBeneficiaryEventImpl>
-      get copyWith => __$$DownSyncBeneficiaryEventImplCopyWithImpl<
-          _$DownSyncBeneficiaryEventImpl>(this, _$identity);
+  _$$DownSyncBeneficiaryEventCopyWith<_$DownSyncBeneficiaryEvent>
+      get copyWith =>
+          __$$DownSyncBeneficiaryEventCopyWithImpl<_$DownSyncBeneficiaryEvent>(
+              this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -340,7 +339,7 @@ abstract class DownSyncBeneficiaryEvent implements BeneficiaryDownSyncEvent {
       required final String boundaryCode,
       required final int batchSize,
       required final int initialServerCount,
-      required final String boundaryName}) = _$DownSyncBeneficiaryEventImpl;
+      required final String boundaryName}) = _$DownSyncBeneficiaryEvent;
 
   String get projectId;
   String get boundaryCode;
@@ -348,16 +347,16 @@ abstract class DownSyncBeneficiaryEvent implements BeneficiaryDownSyncEvent {
   int get initialServerCount;
   String get boundaryName;
   @JsonKey(ignore: true)
-  _$$DownSyncBeneficiaryEventImplCopyWith<_$DownSyncBeneficiaryEventImpl>
+  _$$DownSyncBeneficiaryEventCopyWith<_$DownSyncBeneficiaryEvent>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncCheckTotalCountEventImplCopyWith<$Res> {
-  factory _$$DownSyncCheckTotalCountEventImplCopyWith(
-          _$DownSyncCheckTotalCountEventImpl value,
-          $Res Function(_$DownSyncCheckTotalCountEventImpl) then) =
-      __$$DownSyncCheckTotalCountEventImplCopyWithImpl<$Res>;
+abstract class _$$DownSyncCheckTotalCountEventCopyWith<$Res> {
+  factory _$$DownSyncCheckTotalCountEventCopyWith(
+          _$DownSyncCheckTotalCountEvent value,
+          $Res Function(_$DownSyncCheckTotalCountEvent) then) =
+      __$$DownSyncCheckTotalCountEventCopyWithImpl<$Res>;
   @useResult
   $Res call(
       {String projectId,
@@ -368,13 +367,13 @@ abstract class _$$DownSyncCheckTotalCountEventImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$DownSyncCheckTotalCountEventImplCopyWithImpl<$Res>
+class __$$DownSyncCheckTotalCountEventCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
-        _$DownSyncCheckTotalCountEventImpl>
-    implements _$$DownSyncCheckTotalCountEventImplCopyWith<$Res> {
-  __$$DownSyncCheckTotalCountEventImplCopyWithImpl(
-      _$DownSyncCheckTotalCountEventImpl _value,
-      $Res Function(_$DownSyncCheckTotalCountEventImpl) _then)
+        _$DownSyncCheckTotalCountEvent>
+    implements _$$DownSyncCheckTotalCountEventCopyWith<$Res> {
+  __$$DownSyncCheckTotalCountEventCopyWithImpl(
+      _$DownSyncCheckTotalCountEvent _value,
+      $Res Function(_$DownSyncCheckTotalCountEvent) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -386,7 +385,7 @@ class __$$DownSyncCheckTotalCountEventImplCopyWithImpl<$Res>
     Object? batchSize = null,
     Object? boundaryName = null,
   }) {
-    return _then(_$DownSyncCheckTotalCountEventImpl(
+    return _then(_$DownSyncCheckTotalCountEvent(
       projectId: null == projectId
           ? _value.projectId
           : projectId // ignore: cast_nullable_to_non_nullable
@@ -413,9 +412,8 @@ class __$$DownSyncCheckTotalCountEventImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncCheckTotalCountEventImpl
-    implements DownSyncCheckTotalCountEvent {
-  const _$DownSyncCheckTotalCountEventImpl(
+class _$DownSyncCheckTotalCountEvent implements DownSyncCheckTotalCountEvent {
+  const _$DownSyncCheckTotalCountEvent(
       {required this.projectId,
       required this.boundaryCode,
       required this.pendingSyncCount,
@@ -439,10 +437,10 @@ class _$DownSyncCheckTotalCountEventImpl
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncCheckTotalCountEventImpl &&
+            other is _$DownSyncCheckTotalCountEvent &&
             (identical(other.projectId, projectId) ||
                 other.projectId == projectId) &&
             (identical(other.boundaryCode, boundaryCode) ||
@@ -462,10 +460,9 @@ class _$DownSyncCheckTotalCountEventImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncCheckTotalCountEventImplCopyWith<
-          _$DownSyncCheckTotalCountEventImpl>
-      get copyWith => __$$DownSyncCheckTotalCountEventImplCopyWithImpl<
-          _$DownSyncCheckTotalCountEventImpl>(this, _$identity);
+  _$$DownSyncCheckTotalCountEventCopyWith<_$DownSyncCheckTotalCountEvent>
+      get copyWith => __$$DownSyncCheckTotalCountEventCopyWithImpl<
+          _$DownSyncCheckTotalCountEvent>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -580,7 +577,7 @@ abstract class DownSyncCheckTotalCountEvent
       required final String boundaryCode,
       required final int pendingSyncCount,
       required final int batchSize,
-      required final String boundaryName}) = _$DownSyncCheckTotalCountEventImpl;
+      required final String boundaryName}) = _$DownSyncCheckTotalCountEvent;
 
   String get projectId;
   String get boundaryCode;
@@ -588,17 +585,16 @@ abstract class DownSyncCheckTotalCountEvent
   int get batchSize;
   String get boundaryName;
   @JsonKey(ignore: true)
-  _$$DownSyncCheckTotalCountEventImplCopyWith<
-          _$DownSyncCheckTotalCountEventImpl>
+  _$$DownSyncCheckTotalCountEventCopyWith<_$DownSyncCheckTotalCountEvent>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncGetBatchSizeEventImplCopyWith<$Res> {
-  factory _$$DownSyncGetBatchSizeEventImplCopyWith(
-          _$DownSyncGetBatchSizeEventImpl value,
-          $Res Function(_$DownSyncGetBatchSizeEventImpl) then) =
-      __$$DownSyncGetBatchSizeEventImplCopyWithImpl<$Res>;
+abstract class _$$DownSyncGetBatchSizeEventCopyWith<$Res> {
+  factory _$$DownSyncGetBatchSizeEventCopyWith(
+          _$DownSyncGetBatchSizeEvent value,
+          $Res Function(_$DownSyncGetBatchSizeEvent) then) =
+      __$$DownSyncGetBatchSizeEventCopyWithImpl<$Res>;
   @useResult
   $Res call(
       {List<AppConfiguration> appConfiguration,
@@ -609,13 +605,12 @@ abstract class _$$DownSyncGetBatchSizeEventImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$DownSyncGetBatchSizeEventImplCopyWithImpl<$Res>
+class __$$DownSyncGetBatchSizeEventCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
-        _$DownSyncGetBatchSizeEventImpl>
-    implements _$$DownSyncGetBatchSizeEventImplCopyWith<$Res> {
-  __$$DownSyncGetBatchSizeEventImplCopyWithImpl(
-      _$DownSyncGetBatchSizeEventImpl _value,
-      $Res Function(_$DownSyncGetBatchSizeEventImpl) _then)
+        _$DownSyncGetBatchSizeEvent>
+    implements _$$DownSyncGetBatchSizeEventCopyWith<$Res> {
+  __$$DownSyncGetBatchSizeEventCopyWithImpl(_$DownSyncGetBatchSizeEvent _value,
+      $Res Function(_$DownSyncGetBatchSizeEvent) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -627,7 +622,7 @@ class __$$DownSyncGetBatchSizeEventImplCopyWithImpl<$Res>
     Object? pendingSyncCount = null,
     Object? boundaryName = null,
   }) {
-    return _then(_$DownSyncGetBatchSizeEventImpl(
+    return _then(_$DownSyncGetBatchSizeEvent(
       appConfiguration: null == appConfiguration
           ? _value._appConfiguration
           : appConfiguration // ignore: cast_nullable_to_non_nullable
@@ -654,8 +649,8 @@ class __$$DownSyncGetBatchSizeEventImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncGetBatchSizeEventImpl implements DownSyncGetBatchSizeEvent {
-  const _$DownSyncGetBatchSizeEventImpl(
+class _$DownSyncGetBatchSizeEvent implements DownSyncGetBatchSizeEvent {
+  const _$DownSyncGetBatchSizeEvent(
       {required final List<AppConfiguration> appConfiguration,
       required this.projectId,
       required this.boundaryCode,
@@ -666,8 +661,6 @@ class _$DownSyncGetBatchSizeEventImpl implements DownSyncGetBatchSizeEvent {
   final List<AppConfiguration> _appConfiguration;
   @override
   List<AppConfiguration> get appConfiguration {
-    if (_appConfiguration is EqualUnmodifiableListView)
-      return _appConfiguration;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_appConfiguration);
   }
@@ -687,10 +680,10 @@ class _$DownSyncGetBatchSizeEventImpl implements DownSyncGetBatchSizeEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncGetBatchSizeEventImpl &&
+            other is _$DownSyncGetBatchSizeEvent &&
             const DeepCollectionEquality()
                 .equals(other._appConfiguration, _appConfiguration) &&
             (identical(other.projectId, projectId) ||
@@ -715,9 +708,9 @@ class _$DownSyncGetBatchSizeEventImpl implements DownSyncGetBatchSizeEvent {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncGetBatchSizeEventImplCopyWith<_$DownSyncGetBatchSizeEventImpl>
-      get copyWith => __$$DownSyncGetBatchSizeEventImplCopyWithImpl<
-          _$DownSyncGetBatchSizeEventImpl>(this, _$identity);
+  _$$DownSyncGetBatchSizeEventCopyWith<_$DownSyncGetBatchSizeEvent>
+      get copyWith => __$$DownSyncGetBatchSizeEventCopyWithImpl<
+          _$DownSyncGetBatchSizeEvent>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -831,7 +824,7 @@ abstract class DownSyncGetBatchSizeEvent implements BeneficiaryDownSyncEvent {
       required final String projectId,
       required final String boundaryCode,
       required final int pendingSyncCount,
-      required final String boundaryName}) = _$DownSyncGetBatchSizeEventImpl;
+      required final String boundaryName}) = _$DownSyncGetBatchSizeEvent;
 
   List<AppConfiguration> get appConfiguration;
   String get projectId;
@@ -839,31 +832,30 @@ abstract class DownSyncGetBatchSizeEvent implements BeneficiaryDownSyncEvent {
   int get pendingSyncCount;
   String get boundaryName;
   @JsonKey(ignore: true)
-  _$$DownSyncGetBatchSizeEventImplCopyWith<_$DownSyncGetBatchSizeEventImpl>
+  _$$DownSyncGetBatchSizeEventCopyWith<_$DownSyncGetBatchSizeEvent>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncReportEventImplCopyWith<$Res> {
-  factory _$$DownSyncReportEventImplCopyWith(_$DownSyncReportEventImpl value,
-          $Res Function(_$DownSyncReportEventImpl) then) =
-      __$$DownSyncReportEventImplCopyWithImpl<$Res>;
+abstract class _$$DownSyncReportEventCopyWith<$Res> {
+  factory _$$DownSyncReportEventCopyWith(_$DownSyncReportEvent value,
+          $Res Function(_$DownSyncReportEvent) then) =
+      __$$DownSyncReportEventCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncReportEventImplCopyWithImpl<$Res>
-    extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
-        _$DownSyncReportEventImpl>
-    implements _$$DownSyncReportEventImplCopyWith<$Res> {
-  __$$DownSyncReportEventImplCopyWithImpl(_$DownSyncReportEventImpl _value,
-      $Res Function(_$DownSyncReportEventImpl) _then)
+class __$$DownSyncReportEventCopyWithImpl<$Res>
+    extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res, _$DownSyncReportEvent>
+    implements _$$DownSyncReportEventCopyWith<$Res> {
+  __$$DownSyncReportEventCopyWithImpl(
+      _$DownSyncReportEvent _value, $Res Function(_$DownSyncReportEvent) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncReportEventImpl implements DownSyncReportEvent {
-  const _$DownSyncReportEventImpl();
+class _$DownSyncReportEvent implements DownSyncReportEvent {
+  const _$DownSyncReportEvent();
 
   @override
   String toString() {
@@ -871,10 +863,9 @@ class _$DownSyncReportEventImpl implements DownSyncReportEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$DownSyncReportEventImpl);
+        (other.runtimeType == runtimeType && other is _$DownSyncReportEvent);
   }
 
   @override
@@ -984,32 +975,30 @@ class _$DownSyncReportEventImpl implements DownSyncReportEvent {
 }
 
 abstract class DownSyncReportEvent implements BeneficiaryDownSyncEvent {
-  const factory DownSyncReportEvent() = _$DownSyncReportEventImpl;
+  const factory DownSyncReportEvent() = _$DownSyncReportEvent;
 }
 
 /// @nodoc
-abstract class _$$DownSyncResetStateEventImplCopyWith<$Res> {
-  factory _$$DownSyncResetStateEventImplCopyWith(
-          _$DownSyncResetStateEventImpl value,
-          $Res Function(_$DownSyncResetStateEventImpl) then) =
-      __$$DownSyncResetStateEventImplCopyWithImpl<$Res>;
+abstract class _$$DownSyncResetStateEventCopyWith<$Res> {
+  factory _$$DownSyncResetStateEventCopyWith(_$DownSyncResetStateEvent value,
+          $Res Function(_$DownSyncResetStateEvent) then) =
+      __$$DownSyncResetStateEventCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncResetStateEventImplCopyWithImpl<$Res>
+class __$$DownSyncResetStateEventCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncEventCopyWithImpl<$Res,
-        _$DownSyncResetStateEventImpl>
-    implements _$$DownSyncResetStateEventImplCopyWith<$Res> {
-  __$$DownSyncResetStateEventImplCopyWithImpl(
-      _$DownSyncResetStateEventImpl _value,
-      $Res Function(_$DownSyncResetStateEventImpl) _then)
+        _$DownSyncResetStateEvent>
+    implements _$$DownSyncResetStateEventCopyWith<$Res> {
+  __$$DownSyncResetStateEventCopyWithImpl(_$DownSyncResetStateEvent _value,
+      $Res Function(_$DownSyncResetStateEvent) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncResetStateEventImpl implements DownSyncResetStateEvent {
-  const _$DownSyncResetStateEventImpl();
+class _$DownSyncResetStateEvent implements DownSyncResetStateEvent {
+  const _$DownSyncResetStateEvent();
 
   @override
   String toString() {
@@ -1017,10 +1006,10 @@ class _$DownSyncResetStateEventImpl implements DownSyncResetStateEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncResetStateEventImpl);
+            other is _$DownSyncResetStateEvent);
   }
 
   @override
@@ -1130,7 +1119,7 @@ class _$DownSyncResetStateEventImpl implements DownSyncResetStateEvent {
 }
 
 abstract class DownSyncResetStateEvent implements BeneficiaryDownSyncEvent {
-  const factory DownSyncResetStateEvent() = _$DownSyncResetStateEventImpl;
+  const factory DownSyncResetStateEvent() = _$DownSyncResetStateEvent;
 }
 
 /// @nodoc
@@ -1261,23 +1250,21 @@ class _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$DownSyncInProgressStateImplCopyWith<$Res> {
-  factory _$$DownSyncInProgressStateImplCopyWith(
-          _$DownSyncInProgressStateImpl value,
-          $Res Function(_$DownSyncInProgressStateImpl) then) =
-      __$$DownSyncInProgressStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncInProgressStateCopyWith<$Res> {
+  factory _$$_DownSyncInProgressStateCopyWith(_$_DownSyncInProgressState value,
+          $Res Function(_$_DownSyncInProgressState) then) =
+      __$$_DownSyncInProgressStateCopyWithImpl<$Res>;
   @useResult
   $Res call({int syncedCount, int totalCount});
 }
 
 /// @nodoc
-class __$$DownSyncInProgressStateImplCopyWithImpl<$Res>
+class __$$_DownSyncInProgressStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncInProgressStateImpl>
-    implements _$$DownSyncInProgressStateImplCopyWith<$Res> {
-  __$$DownSyncInProgressStateImplCopyWithImpl(
-      _$DownSyncInProgressStateImpl _value,
-      $Res Function(_$DownSyncInProgressStateImpl) _then)
+        _$_DownSyncInProgressState>
+    implements _$$_DownSyncInProgressStateCopyWith<$Res> {
+  __$$_DownSyncInProgressStateCopyWithImpl(_$_DownSyncInProgressState _value,
+      $Res Function(_$_DownSyncInProgressState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1286,7 +1273,7 @@ class __$$DownSyncInProgressStateImplCopyWithImpl<$Res>
     Object? syncedCount = null,
     Object? totalCount = null,
   }) {
-    return _then(_$DownSyncInProgressStateImpl(
+    return _then(_$_DownSyncInProgressState(
       null == syncedCount
           ? _value.syncedCount
           : syncedCount // ignore: cast_nullable_to_non_nullable
@@ -1301,8 +1288,8 @@ class __$$DownSyncInProgressStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncInProgressStateImpl extends _DownSyncInProgressState {
-  const _$DownSyncInProgressStateImpl(this.syncedCount, this.totalCount)
+class _$_DownSyncInProgressState extends _DownSyncInProgressState {
+  const _$_DownSyncInProgressState(this.syncedCount, this.totalCount)
       : super._();
 
   @override
@@ -1316,10 +1303,10 @@ class _$DownSyncInProgressStateImpl extends _DownSyncInProgressState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncInProgressStateImpl &&
+            other is _$_DownSyncInProgressState &&
             (identical(other.syncedCount, syncedCount) ||
                 other.syncedCount == syncedCount) &&
             (identical(other.totalCount, totalCount) ||
@@ -1332,9 +1319,10 @@ class _$DownSyncInProgressStateImpl extends _DownSyncInProgressState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncInProgressStateImplCopyWith<_$DownSyncInProgressStateImpl>
-      get copyWith => __$$DownSyncInProgressStateImplCopyWithImpl<
-          _$DownSyncInProgressStateImpl>(this, _$identity);
+  _$$_DownSyncInProgressStateCopyWith<_$_DownSyncInProgressState>
+      get copyWith =>
+          __$$_DownSyncInProgressStateCopyWithImpl<_$_DownSyncInProgressState>(
+              this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1467,33 +1455,32 @@ class _$DownSyncInProgressStateImpl extends _DownSyncInProgressState {
 
 abstract class _DownSyncInProgressState extends BeneficiaryDownSyncState {
   const factory _DownSyncInProgressState(
-          final int syncedCount, final int totalCount) =
-      _$DownSyncInProgressStateImpl;
+      final int syncedCount, final int totalCount) = _$_DownSyncInProgressState;
   const _DownSyncInProgressState._() : super._();
 
   int get syncedCount;
   int get totalCount;
   @JsonKey(ignore: true)
-  _$$DownSyncInProgressStateImplCopyWith<_$DownSyncInProgressStateImpl>
+  _$$_DownSyncInProgressStateCopyWith<_$_DownSyncInProgressState>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncSuccessStateImplCopyWith<$Res> {
-  factory _$$DownSyncSuccessStateImplCopyWith(_$DownSyncSuccessStateImpl value,
-          $Res Function(_$DownSyncSuccessStateImpl) then) =
-      __$$DownSyncSuccessStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncSuccessStateCopyWith<$Res> {
+  factory _$$_DownSyncSuccessStateCopyWith(_$_DownSyncSuccessState value,
+          $Res Function(_$_DownSyncSuccessState) then) =
+      __$$_DownSyncSuccessStateCopyWithImpl<$Res>;
   @useResult
   $Res call({DownsyncModel downSyncResult});
 }
 
 /// @nodoc
-class __$$DownSyncSuccessStateImplCopyWithImpl<$Res>
+class __$$_DownSyncSuccessStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncSuccessStateImpl>
-    implements _$$DownSyncSuccessStateImplCopyWith<$Res> {
-  __$$DownSyncSuccessStateImplCopyWithImpl(_$DownSyncSuccessStateImpl _value,
-      $Res Function(_$DownSyncSuccessStateImpl) _then)
+        _$_DownSyncSuccessState>
+    implements _$$_DownSyncSuccessStateCopyWith<$Res> {
+  __$$_DownSyncSuccessStateCopyWithImpl(_$_DownSyncSuccessState _value,
+      $Res Function(_$_DownSyncSuccessState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1501,7 +1488,7 @@ class __$$DownSyncSuccessStateImplCopyWithImpl<$Res>
   $Res call({
     Object? downSyncResult = null,
   }) {
-    return _then(_$DownSyncSuccessStateImpl(
+    return _then(_$_DownSyncSuccessState(
       null == downSyncResult
           ? _value.downSyncResult
           : downSyncResult // ignore: cast_nullable_to_non_nullable
@@ -1512,8 +1499,8 @@ class __$$DownSyncSuccessStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncSuccessStateImpl extends _DownSyncSuccessState {
-  const _$DownSyncSuccessStateImpl(this.downSyncResult) : super._();
+class _$_DownSyncSuccessState extends _DownSyncSuccessState {
+  const _$_DownSyncSuccessState(this.downSyncResult) : super._();
 
   @override
   final DownsyncModel downSyncResult;
@@ -1524,10 +1511,10 @@ class _$DownSyncSuccessStateImpl extends _DownSyncSuccessState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncSuccessStateImpl &&
+            other is _$_DownSyncSuccessState &&
             (identical(other.downSyncResult, downSyncResult) ||
                 other.downSyncResult == downSyncResult));
   }
@@ -1538,10 +1525,9 @@ class _$DownSyncSuccessStateImpl extends _DownSyncSuccessState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncSuccessStateImplCopyWith<_$DownSyncSuccessStateImpl>
-      get copyWith =>
-          __$$DownSyncSuccessStateImplCopyWithImpl<_$DownSyncSuccessStateImpl>(
-              this, _$identity);
+  _$$_DownSyncSuccessStateCopyWith<_$_DownSyncSuccessState> get copyWith =>
+      __$$_DownSyncSuccessStateCopyWithImpl<_$_DownSyncSuccessState>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1674,21 +1660,21 @@ class _$DownSyncSuccessStateImpl extends _DownSyncSuccessState {
 
 abstract class _DownSyncSuccessState extends BeneficiaryDownSyncState {
   const factory _DownSyncSuccessState(final DownsyncModel downSyncResult) =
-      _$DownSyncSuccessStateImpl;
+      _$_DownSyncSuccessState;
   const _DownSyncSuccessState._() : super._();
 
   DownsyncModel get downSyncResult;
   @JsonKey(ignore: true)
-  _$$DownSyncSuccessStateImplCopyWith<_$DownSyncSuccessStateImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$_DownSyncSuccessStateCopyWith<_$_DownSyncSuccessState> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncGetBatchSizeStateImplCopyWith<$Res> {
-  factory _$$DownSyncGetBatchSizeStateImplCopyWith(
-          _$DownSyncGetBatchSizeStateImpl value,
-          $Res Function(_$DownSyncGetBatchSizeStateImpl) then) =
-      __$$DownSyncGetBatchSizeStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncGetBatchSizeStateCopyWith<$Res> {
+  factory _$$_DownSyncGetBatchSizeStateCopyWith(
+          _$_DownSyncGetBatchSizeState value,
+          $Res Function(_$_DownSyncGetBatchSizeState) then) =
+      __$$_DownSyncGetBatchSizeStateCopyWithImpl<$Res>;
   @useResult
   $Res call(
       {int batchSize,
@@ -1699,13 +1685,13 @@ abstract class _$$DownSyncGetBatchSizeStateImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$DownSyncGetBatchSizeStateImplCopyWithImpl<$Res>
+class __$$_DownSyncGetBatchSizeStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncGetBatchSizeStateImpl>
-    implements _$$DownSyncGetBatchSizeStateImplCopyWith<$Res> {
-  __$$DownSyncGetBatchSizeStateImplCopyWithImpl(
-      _$DownSyncGetBatchSizeStateImpl _value,
-      $Res Function(_$DownSyncGetBatchSizeStateImpl) _then)
+        _$_DownSyncGetBatchSizeState>
+    implements _$$_DownSyncGetBatchSizeStateCopyWith<$Res> {
+  __$$_DownSyncGetBatchSizeStateCopyWithImpl(
+      _$_DownSyncGetBatchSizeState _value,
+      $Res Function(_$_DownSyncGetBatchSizeState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1717,7 +1703,7 @@ class __$$DownSyncGetBatchSizeStateImplCopyWithImpl<$Res>
     Object? pendingSyncCount = null,
     Object? boundaryName = null,
   }) {
-    return _then(_$DownSyncGetBatchSizeStateImpl(
+    return _then(_$_DownSyncGetBatchSizeState(
       null == batchSize
           ? _value.batchSize
           : batchSize // ignore: cast_nullable_to_non_nullable
@@ -1744,8 +1730,8 @@ class __$$DownSyncGetBatchSizeStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncGetBatchSizeStateImpl extends _DownSyncGetBatchSizeState {
-  const _$DownSyncGetBatchSizeStateImpl(this.batchSize, this.projectId,
+class _$_DownSyncGetBatchSizeState extends _DownSyncGetBatchSizeState {
+  const _$_DownSyncGetBatchSizeState(this.batchSize, this.projectId,
       this.boundaryCode, this.pendingSyncCount, this.boundaryName)
       : super._();
 
@@ -1766,10 +1752,10 @@ class _$DownSyncGetBatchSizeStateImpl extends _DownSyncGetBatchSizeState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncGetBatchSizeStateImpl &&
+            other is _$_DownSyncGetBatchSizeState &&
             (identical(other.batchSize, batchSize) ||
                 other.batchSize == batchSize) &&
             (identical(other.projectId, projectId) ||
@@ -1789,9 +1775,9 @@ class _$DownSyncGetBatchSizeStateImpl extends _DownSyncGetBatchSizeState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncGetBatchSizeStateImplCopyWith<_$DownSyncGetBatchSizeStateImpl>
-      get copyWith => __$$DownSyncGetBatchSizeStateImplCopyWithImpl<
-          _$DownSyncGetBatchSizeStateImpl>(this, _$identity);
+  _$$_DownSyncGetBatchSizeStateCopyWith<_$_DownSyncGetBatchSizeState>
+      get copyWith => __$$_DownSyncGetBatchSizeStateCopyWithImpl<
+          _$_DownSyncGetBatchSizeState>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1931,7 +1917,7 @@ abstract class _DownSyncGetBatchSizeState extends BeneficiaryDownSyncState {
       final String projectId,
       final String boundaryCode,
       final int pendingSyncCount,
-      final String boundaryName) = _$DownSyncGetBatchSizeStateImpl;
+      final String boundaryName) = _$_DownSyncGetBatchSizeState;
   const _DownSyncGetBatchSizeState._() : super._();
 
   int get batchSize;
@@ -1940,26 +1926,26 @@ abstract class _DownSyncGetBatchSizeState extends BeneficiaryDownSyncState {
   int get pendingSyncCount;
   String get boundaryName;
   @JsonKey(ignore: true)
-  _$$DownSyncGetBatchSizeStateImplCopyWith<_$DownSyncGetBatchSizeStateImpl>
+  _$$_DownSyncGetBatchSizeStateCopyWith<_$_DownSyncGetBatchSizeState>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncLoadingStateImplCopyWith<$Res> {
-  factory _$$DownSyncLoadingStateImplCopyWith(_$DownSyncLoadingStateImpl value,
-          $Res Function(_$DownSyncLoadingStateImpl) then) =
-      __$$DownSyncLoadingStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncLoadingStateCopyWith<$Res> {
+  factory _$$_DownSyncLoadingStateCopyWith(_$_DownSyncLoadingState value,
+          $Res Function(_$_DownSyncLoadingState) then) =
+      __$$_DownSyncLoadingStateCopyWithImpl<$Res>;
   @useResult
   $Res call({bool isPop});
 }
 
 /// @nodoc
-class __$$DownSyncLoadingStateImplCopyWithImpl<$Res>
+class __$$_DownSyncLoadingStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncLoadingStateImpl>
-    implements _$$DownSyncLoadingStateImplCopyWith<$Res> {
-  __$$DownSyncLoadingStateImplCopyWithImpl(_$DownSyncLoadingStateImpl _value,
-      $Res Function(_$DownSyncLoadingStateImpl) _then)
+        _$_DownSyncLoadingState>
+    implements _$$_DownSyncLoadingStateCopyWith<$Res> {
+  __$$_DownSyncLoadingStateCopyWithImpl(_$_DownSyncLoadingState _value,
+      $Res Function(_$_DownSyncLoadingState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -1967,7 +1953,7 @@ class __$$DownSyncLoadingStateImplCopyWithImpl<$Res>
   $Res call({
     Object? isPop = null,
   }) {
-    return _then(_$DownSyncLoadingStateImpl(
+    return _then(_$_DownSyncLoadingState(
       null == isPop
           ? _value.isPop
           : isPop // ignore: cast_nullable_to_non_nullable
@@ -1978,8 +1964,8 @@ class __$$DownSyncLoadingStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncLoadingStateImpl extends _DownSyncLoadingState {
-  const _$DownSyncLoadingStateImpl(this.isPop) : super._();
+class _$_DownSyncLoadingState extends _DownSyncLoadingState {
+  const _$_DownSyncLoadingState(this.isPop) : super._();
 
   @override
   final bool isPop;
@@ -1990,10 +1976,10 @@ class _$DownSyncLoadingStateImpl extends _DownSyncLoadingState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncLoadingStateImpl &&
+            other is _$_DownSyncLoadingState &&
             (identical(other.isPop, isPop) || other.isPop == isPop));
   }
 
@@ -2003,10 +1989,9 @@ class _$DownSyncLoadingStateImpl extends _DownSyncLoadingState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncLoadingStateImplCopyWith<_$DownSyncLoadingStateImpl>
-      get copyWith =>
-          __$$DownSyncLoadingStateImplCopyWithImpl<_$DownSyncLoadingStateImpl>(
-              this, _$identity);
+  _$$_DownSyncLoadingStateCopyWith<_$_DownSyncLoadingState> get copyWith =>
+      __$$_DownSyncLoadingStateCopyWithImpl<_$_DownSyncLoadingState>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2139,39 +2124,39 @@ class _$DownSyncLoadingStateImpl extends _DownSyncLoadingState {
 
 abstract class _DownSyncLoadingState extends BeneficiaryDownSyncState {
   const factory _DownSyncLoadingState(final bool isPop) =
-      _$DownSyncLoadingStateImpl;
+      _$_DownSyncLoadingState;
   const _DownSyncLoadingState._() : super._();
 
   bool get isPop;
   @JsonKey(ignore: true)
-  _$$DownSyncLoadingStateImplCopyWith<_$DownSyncLoadingStateImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$_DownSyncLoadingStateCopyWith<_$_DownSyncLoadingState> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncInsufficientStorageStateImplCopyWith<$Res> {
-  factory _$$DownSyncInsufficientStorageStateImplCopyWith(
-          _$DownSyncInsufficientStorageStateImpl value,
-          $Res Function(_$DownSyncInsufficientStorageStateImpl) then) =
-      __$$DownSyncInsufficientStorageStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncInsufficientStorageStateCopyWith<$Res> {
+  factory _$$_DownSyncInsufficientStorageStateCopyWith(
+          _$_DownSyncInsufficientStorageState value,
+          $Res Function(_$_DownSyncInsufficientStorageState) then) =
+      __$$_DownSyncInsufficientStorageStateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncInsufficientStorageStateImplCopyWithImpl<$Res>
+class __$$_DownSyncInsufficientStorageStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncInsufficientStorageStateImpl>
-    implements _$$DownSyncInsufficientStorageStateImplCopyWith<$Res> {
-  __$$DownSyncInsufficientStorageStateImplCopyWithImpl(
-      _$DownSyncInsufficientStorageStateImpl _value,
-      $Res Function(_$DownSyncInsufficientStorageStateImpl) _then)
+        _$_DownSyncInsufficientStorageState>
+    implements _$$_DownSyncInsufficientStorageStateCopyWith<$Res> {
+  __$$_DownSyncInsufficientStorageStateCopyWithImpl(
+      _$_DownSyncInsufficientStorageState _value,
+      $Res Function(_$_DownSyncInsufficientStorageState) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncInsufficientStorageStateImpl
+class _$_DownSyncInsufficientStorageState
     extends _DownSyncInsufficientStorageState {
-  const _$DownSyncInsufficientStorageStateImpl() : super._();
+  const _$_DownSyncInsufficientStorageState() : super._();
 
   @override
   String toString() {
@@ -2179,10 +2164,10 @@ class _$DownSyncInsufficientStorageStateImpl
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncInsufficientStorageStateImpl);
+            other is _$_DownSyncInsufficientStorageState);
   }
 
   @override
@@ -2320,28 +2305,26 @@ class _$DownSyncInsufficientStorageStateImpl
 abstract class _DownSyncInsufficientStorageState
     extends BeneficiaryDownSyncState {
   const factory _DownSyncInsufficientStorageState() =
-      _$DownSyncInsufficientStorageStateImpl;
+      _$_DownSyncInsufficientStorageState;
   const _DownSyncInsufficientStorageState._() : super._();
 }
 
 /// @nodoc
-abstract class _$$DownSyncDataFoundStateImplCopyWith<$Res> {
-  factory _$$DownSyncDataFoundStateImplCopyWith(
-          _$DownSyncDataFoundStateImpl value,
-          $Res Function(_$DownSyncDataFoundStateImpl) then) =
-      __$$DownSyncDataFoundStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncDataFoundStateCopyWith<$Res> {
+  factory _$$_DownSyncDataFoundStateCopyWith(_$_DownSyncDataFoundState value,
+          $Res Function(_$_DownSyncDataFoundState) then) =
+      __$$_DownSyncDataFoundStateCopyWithImpl<$Res>;
   @useResult
   $Res call({int initialServerCount, int batchSize});
 }
 
 /// @nodoc
-class __$$DownSyncDataFoundStateImplCopyWithImpl<$Res>
+class __$$_DownSyncDataFoundStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncDataFoundStateImpl>
-    implements _$$DownSyncDataFoundStateImplCopyWith<$Res> {
-  __$$DownSyncDataFoundStateImplCopyWithImpl(
-      _$DownSyncDataFoundStateImpl _value,
-      $Res Function(_$DownSyncDataFoundStateImpl) _then)
+        _$_DownSyncDataFoundState>
+    implements _$$_DownSyncDataFoundStateCopyWith<$Res> {
+  __$$_DownSyncDataFoundStateCopyWithImpl(_$_DownSyncDataFoundState _value,
+      $Res Function(_$_DownSyncDataFoundState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -2350,7 +2333,7 @@ class __$$DownSyncDataFoundStateImplCopyWithImpl<$Res>
     Object? initialServerCount = null,
     Object? batchSize = null,
   }) {
-    return _then(_$DownSyncDataFoundStateImpl(
+    return _then(_$_DownSyncDataFoundState(
       null == initialServerCount
           ? _value.initialServerCount
           : initialServerCount // ignore: cast_nullable_to_non_nullable
@@ -2365,8 +2348,8 @@ class __$$DownSyncDataFoundStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncDataFoundStateImpl extends _DownSyncDataFoundState {
-  const _$DownSyncDataFoundStateImpl(this.initialServerCount, this.batchSize)
+class _$_DownSyncDataFoundState extends _DownSyncDataFoundState {
+  const _$_DownSyncDataFoundState(this.initialServerCount, this.batchSize)
       : super._();
 
   @override
@@ -2380,10 +2363,10 @@ class _$DownSyncDataFoundStateImpl extends _DownSyncDataFoundState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncDataFoundStateImpl &&
+            other is _$_DownSyncDataFoundState &&
             (identical(other.initialServerCount, initialServerCount) ||
                 other.initialServerCount == initialServerCount) &&
             (identical(other.batchSize, batchSize) ||
@@ -2396,9 +2379,9 @@ class _$DownSyncDataFoundStateImpl extends _DownSyncDataFoundState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncDataFoundStateImplCopyWith<_$DownSyncDataFoundStateImpl>
-      get copyWith => __$$DownSyncDataFoundStateImplCopyWithImpl<
-          _$DownSyncDataFoundStateImpl>(this, _$identity);
+  _$$_DownSyncDataFoundStateCopyWith<_$_DownSyncDataFoundState> get copyWith =>
+      __$$_DownSyncDataFoundStateCopyWithImpl<_$_DownSyncDataFoundState>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2532,37 +2515,36 @@ class _$DownSyncDataFoundStateImpl extends _DownSyncDataFoundState {
 abstract class _DownSyncDataFoundState extends BeneficiaryDownSyncState {
   const factory _DownSyncDataFoundState(
           final int initialServerCount, final int batchSize) =
-      _$DownSyncDataFoundStateImpl;
+      _$_DownSyncDataFoundState;
   const _DownSyncDataFoundState._() : super._();
 
   int get initialServerCount;
   int get batchSize;
   @JsonKey(ignore: true)
-  _$$DownSyncDataFoundStateImplCopyWith<_$DownSyncDataFoundStateImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$_DownSyncDataFoundStateCopyWith<_$_DownSyncDataFoundState> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncResetStateImplCopyWith<$Res> {
-  factory _$$DownSyncResetStateImplCopyWith(_$DownSyncResetStateImpl value,
-          $Res Function(_$DownSyncResetStateImpl) then) =
-      __$$DownSyncResetStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncResetStateCopyWith<$Res> {
+  factory _$$_DownSyncResetStateCopyWith(_$_DownSyncResetState value,
+          $Res Function(_$_DownSyncResetState) then) =
+      __$$_DownSyncResetStateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncResetStateImplCopyWithImpl<$Res>
-    extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncResetStateImpl>
-    implements _$$DownSyncResetStateImplCopyWith<$Res> {
-  __$$DownSyncResetStateImplCopyWithImpl(_$DownSyncResetStateImpl _value,
-      $Res Function(_$DownSyncResetStateImpl) _then)
+class __$$_DownSyncResetStateCopyWithImpl<$Res>
+    extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res, _$_DownSyncResetState>
+    implements _$$_DownSyncResetStateCopyWith<$Res> {
+  __$$_DownSyncResetStateCopyWithImpl(
+      _$_DownSyncResetState _value, $Res Function(_$_DownSyncResetState) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncResetStateImpl extends _DownSyncResetState {
-  const _$DownSyncResetStateImpl() : super._();
+class _$_DownSyncResetState extends _DownSyncResetState {
+  const _$_DownSyncResetState() : super._();
 
   @override
   String toString() {
@@ -2570,9 +2552,9 @@ class _$DownSyncResetStateImpl extends _DownSyncResetState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$DownSyncResetStateImpl);
+        (other.runtimeType == runtimeType && other is _$_DownSyncResetState);
   }
 
   @override
@@ -2708,34 +2690,33 @@ class _$DownSyncResetStateImpl extends _DownSyncResetState {
 }
 
 abstract class _DownSyncResetState extends BeneficiaryDownSyncState {
-  const factory _DownSyncResetState() = _$DownSyncResetStateImpl;
+  const factory _DownSyncResetState() = _$_DownSyncResetState;
   const _DownSyncResetState._() : super._();
 }
 
 /// @nodoc
-abstract class _$$DownSynnCountCheckFailedStateImplCopyWith<$Res> {
-  factory _$$DownSynnCountCheckFailedStateImplCopyWith(
-          _$DownSynnCountCheckFailedStateImpl value,
-          $Res Function(_$DownSynnCountCheckFailedStateImpl) then) =
-      __$$DownSynnCountCheckFailedStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSynnCountCheckFailedStateCopyWith<$Res> {
+  factory _$$_DownSynnCountCheckFailedStateCopyWith(
+          _$_DownSynnCountCheckFailedState value,
+          $Res Function(_$_DownSynnCountCheckFailedState) then) =
+      __$$_DownSynnCountCheckFailedStateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSynnCountCheckFailedStateImplCopyWithImpl<$Res>
+class __$$_DownSynnCountCheckFailedStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSynnCountCheckFailedStateImpl>
-    implements _$$DownSynnCountCheckFailedStateImplCopyWith<$Res> {
-  __$$DownSynnCountCheckFailedStateImplCopyWithImpl(
-      _$DownSynnCountCheckFailedStateImpl _value,
-      $Res Function(_$DownSynnCountCheckFailedStateImpl) _then)
+        _$_DownSynnCountCheckFailedState>
+    implements _$$_DownSynnCountCheckFailedStateCopyWith<$Res> {
+  __$$_DownSynnCountCheckFailedStateCopyWithImpl(
+      _$_DownSynnCountCheckFailedState _value,
+      $Res Function(_$_DownSynnCountCheckFailedState) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSynnCountCheckFailedStateImpl
-    extends _DownSynnCountCheckFailedState {
-  const _$DownSynnCountCheckFailedStateImpl() : super._();
+class _$_DownSynnCountCheckFailedState extends _DownSynnCountCheckFailedState {
+  const _$_DownSynnCountCheckFailedState() : super._();
 
   @override
   String toString() {
@@ -2743,10 +2724,10 @@ class _$DownSynnCountCheckFailedStateImpl
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSynnCountCheckFailedStateImpl);
+            other is _$_DownSynnCountCheckFailedState);
   }
 
   @override
@@ -2883,31 +2864,31 @@ class _$DownSynnCountCheckFailedStateImpl
 
 abstract class _DownSynnCountCheckFailedState extends BeneficiaryDownSyncState {
   const factory _DownSynnCountCheckFailedState() =
-      _$DownSynnCountCheckFailedStateImpl;
+      _$_DownSynnCountCheckFailedState;
   const _DownSynnCountCheckFailedState._() : super._();
 }
 
 /// @nodoc
-abstract class _$$DownSyncFailureStateImplCopyWith<$Res> {
-  factory _$$DownSyncFailureStateImplCopyWith(_$DownSyncFailureStateImpl value,
-          $Res Function(_$DownSyncFailureStateImpl) then) =
-      __$$DownSyncFailureStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncFailureStateCopyWith<$Res> {
+  factory _$$_DownSyncFailureStateCopyWith(_$_DownSyncFailureState value,
+          $Res Function(_$_DownSyncFailureState) then) =
+      __$$_DownSyncFailureStateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncFailureStateImplCopyWithImpl<$Res>
+class __$$_DownSyncFailureStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncFailureStateImpl>
-    implements _$$DownSyncFailureStateImplCopyWith<$Res> {
-  __$$DownSyncFailureStateImplCopyWithImpl(_$DownSyncFailureStateImpl _value,
-      $Res Function(_$DownSyncFailureStateImpl) _then)
+        _$_DownSyncFailureState>
+    implements _$$_DownSyncFailureStateCopyWith<$Res> {
+  __$$_DownSyncFailureStateCopyWithImpl(_$_DownSyncFailureState _value,
+      $Res Function(_$_DownSyncFailureState) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncFailureStateImpl extends _DownSyncFailureState {
-  const _$DownSyncFailureStateImpl() : super._();
+class _$_DownSyncFailureState extends _DownSyncFailureState {
+  const _$_DownSyncFailureState() : super._();
 
   @override
   String toString() {
@@ -2915,10 +2896,9 @@ class _$DownSyncFailureStateImpl extends _DownSyncFailureState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$DownSyncFailureStateImpl);
+        (other.runtimeType == runtimeType && other is _$_DownSyncFailureState);
   }
 
   @override
@@ -3054,26 +3034,25 @@ class _$DownSyncFailureStateImpl extends _DownSyncFailureState {
 }
 
 abstract class _DownSyncFailureState extends BeneficiaryDownSyncState {
-  const factory _DownSyncFailureState() = _$DownSyncFailureStateImpl;
+  const factory _DownSyncFailureState() = _$_DownSyncFailureState;
   const _DownSyncFailureState._() : super._();
 }
 
 /// @nodoc
-abstract class _$$DownSyncReportStateImplCopyWith<$Res> {
-  factory _$$DownSyncReportStateImplCopyWith(_$DownSyncReportStateImpl value,
-          $Res Function(_$DownSyncReportStateImpl) then) =
-      __$$DownSyncReportStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncReportStateCopyWith<$Res> {
+  factory _$$_DownSyncReportStateCopyWith(_$_DownSyncReportState value,
+          $Res Function(_$_DownSyncReportState) then) =
+      __$$_DownSyncReportStateCopyWithImpl<$Res>;
   @useResult
   $Res call({List<DownsyncModel> downsyncCriteriaList});
 }
 
 /// @nodoc
-class __$$DownSyncReportStateImplCopyWithImpl<$Res>
-    extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncReportStateImpl>
-    implements _$$DownSyncReportStateImplCopyWith<$Res> {
-  __$$DownSyncReportStateImplCopyWithImpl(_$DownSyncReportStateImpl _value,
-      $Res Function(_$DownSyncReportStateImpl) _then)
+class __$$_DownSyncReportStateCopyWithImpl<$Res>
+    extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res, _$_DownSyncReportState>
+    implements _$$_DownSyncReportStateCopyWith<$Res> {
+  __$$_DownSyncReportStateCopyWithImpl(_$_DownSyncReportState _value,
+      $Res Function(_$_DownSyncReportState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -3081,7 +3060,7 @@ class __$$DownSyncReportStateImplCopyWithImpl<$Res>
   $Res call({
     Object? downsyncCriteriaList = null,
   }) {
-    return _then(_$DownSyncReportStateImpl(
+    return _then(_$_DownSyncReportState(
       null == downsyncCriteriaList
           ? _value._downsyncCriteriaList
           : downsyncCriteriaList // ignore: cast_nullable_to_non_nullable
@@ -3092,17 +3071,14 @@ class __$$DownSyncReportStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DownSyncReportStateImpl extends _DownSyncReportState {
-  const _$DownSyncReportStateImpl(
-      final List<DownsyncModel> downsyncCriteriaList)
+class _$_DownSyncReportState extends _DownSyncReportState {
+  const _$_DownSyncReportState(final List<DownsyncModel> downsyncCriteriaList)
       : _downsyncCriteriaList = downsyncCriteriaList,
         super._();
 
   final List<DownsyncModel> _downsyncCriteriaList;
   @override
   List<DownsyncModel> get downsyncCriteriaList {
-    if (_downsyncCriteriaList is EqualUnmodifiableListView)
-      return _downsyncCriteriaList;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_downsyncCriteriaList);
   }
@@ -3113,10 +3089,10 @@ class _$DownSyncReportStateImpl extends _DownSyncReportState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncReportStateImpl &&
+            other is _$_DownSyncReportState &&
             const DeepCollectionEquality()
                 .equals(other._downsyncCriteriaList, _downsyncCriteriaList));
   }
@@ -3128,8 +3104,8 @@ class _$DownSyncReportStateImpl extends _DownSyncReportState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$DownSyncReportStateImplCopyWith<_$DownSyncReportStateImpl> get copyWith =>
-      __$$DownSyncReportStateImplCopyWithImpl<_$DownSyncReportStateImpl>(
+  _$$_DownSyncReportStateCopyWith<_$_DownSyncReportState> get copyWith =>
+      __$$_DownSyncReportStateCopyWithImpl<_$_DownSyncReportState>(
           this, _$identity);
 
   @override
@@ -3263,39 +3239,37 @@ class _$DownSyncReportStateImpl extends _DownSyncReportState {
 
 abstract class _DownSyncReportState extends BeneficiaryDownSyncState {
   const factory _DownSyncReportState(
-          final List<DownsyncModel> downsyncCriteriaList) =
-      _$DownSyncReportStateImpl;
+      final List<DownsyncModel> downsyncCriteriaList) = _$_DownSyncReportState;
   const _DownSyncReportState._() : super._();
 
   List<DownsyncModel> get downsyncCriteriaList;
   @JsonKey(ignore: true)
-  _$$DownSyncReportStateImplCopyWith<_$DownSyncReportStateImpl> get copyWith =>
+  _$$_DownSyncReportStateCopyWith<_$_DownSyncReportState> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$DownSyncPendingSyncStateImplCopyWith<$Res> {
-  factory _$$DownSyncPendingSyncStateImplCopyWith(
-          _$DownSyncPendingSyncStateImpl value,
-          $Res Function(_$DownSyncPendingSyncStateImpl) then) =
-      __$$DownSyncPendingSyncStateImplCopyWithImpl<$Res>;
+abstract class _$$_DownSyncPendingSyncStateCopyWith<$Res> {
+  factory _$$_DownSyncPendingSyncStateCopyWith(
+          _$_DownSyncPendingSyncState value,
+          $Res Function(_$_DownSyncPendingSyncState) then) =
+      __$$_DownSyncPendingSyncStateCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$DownSyncPendingSyncStateImplCopyWithImpl<$Res>
+class __$$_DownSyncPendingSyncStateCopyWithImpl<$Res>
     extends _$BeneficiaryDownSyncStateCopyWithImpl<$Res,
-        _$DownSyncPendingSyncStateImpl>
-    implements _$$DownSyncPendingSyncStateImplCopyWith<$Res> {
-  __$$DownSyncPendingSyncStateImplCopyWithImpl(
-      _$DownSyncPendingSyncStateImpl _value,
-      $Res Function(_$DownSyncPendingSyncStateImpl) _then)
+        _$_DownSyncPendingSyncState>
+    implements _$$_DownSyncPendingSyncStateCopyWith<$Res> {
+  __$$_DownSyncPendingSyncStateCopyWithImpl(_$_DownSyncPendingSyncState _value,
+      $Res Function(_$_DownSyncPendingSyncState) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$DownSyncPendingSyncStateImpl extends _DownSyncPendingSyncState {
-  const _$DownSyncPendingSyncStateImpl() : super._();
+class _$_DownSyncPendingSyncState extends _DownSyncPendingSyncState {
+  const _$_DownSyncPendingSyncState() : super._();
 
   @override
   String toString() {
@@ -3303,10 +3277,10 @@ class _$DownSyncPendingSyncStateImpl extends _DownSyncPendingSyncState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DownSyncPendingSyncStateImpl);
+            other is _$_DownSyncPendingSyncState);
   }
 
   @override
@@ -3442,6 +3416,6 @@ class _$DownSyncPendingSyncStateImpl extends _DownSyncPendingSyncState {
 }
 
 abstract class _DownSyncPendingSyncState extends BeneficiaryDownSyncState {
-  const factory _DownSyncPendingSyncState() = _$DownSyncPendingSyncStateImpl;
+  const factory _DownSyncPendingSyncState() = _$_DownSyncPendingSyncState;
   const _DownSyncPendingSyncState._() : super._();
 }

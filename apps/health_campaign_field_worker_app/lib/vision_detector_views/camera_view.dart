@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:digit_components/theme/digit_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
+
+import '../widgets/showcase/showcase_wrappers.dart';
 
 class CameraView extends StatefulWidget {
   const CameraView({
@@ -15,8 +16,6 @@ class CameraView extends StatefulWidget {
     this.onDetectorViewModeChanged,
     this.onCameraLensDirectionChanged,
     this.initialCameraLensDirection = CameraLensDirection.back,
-    required this.cameraController,
-    required this.cameras,
   }) : super(key: key);
 
   final CustomPaint? customPaint;
@@ -25,8 +24,6 @@ class CameraView extends StatefulWidget {
   final VoidCallback? onDetectorViewModeChanged;
   final Function(CameraLensDirection direction)? onCameraLensDirectionChanged;
   final CameraLensDirection initialCameraLensDirection;
-  final CameraController? cameraController;
-  final List<CameraDescription> cameras;
 
   @override
   State<CameraView> createState() => _CameraViewState();
@@ -52,9 +49,15 @@ class _CameraViewState extends State<CameraView> {
   }
 
   void _initialize() async {
-    _cameras = widget.cameras;
-    _cameraIndex = _cameras.indexWhere(
-        (camera) => camera.lensDirection == widget.initialCameraLensDirection);
+    if (_cameras.isEmpty) {
+      _cameras = await availableCameras();
+    }
+    for (var i = 0; i < _cameras.length; i++) {
+      if (_cameras[i].lensDirection == widget.initialCameraLensDirection) {
+        _cameraIndex = i;
+        break;
+      }
+    }
     if (_cameraIndex != -1) {
       _startLiveFeed();
     }
@@ -82,8 +85,8 @@ class _CameraViewState extends State<CameraView> {
         children: <Widget>[
           Center(
             child: _changingCameraLens
-                ? const Center(
-                    child: Text('Changing camera lens'),
+                ? Center(
+                    child: const Text('Changing camera lens'),
                   )
                 : CameraPreview(
                     _controller!,
@@ -110,7 +113,7 @@ class _CameraViewState extends State<CameraView> {
             heroTag: Object(),
             onPressed: () => Navigator.of(context).pop(),
             backgroundColor: Colors.black54,
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_ios_outlined,
               size: 20,
             ),
@@ -194,7 +197,7 @@ class _CameraViewState extends State<CameraView> {
                     child: Center(
                       child: Text(
                         '${_currentZoomLevel.toStringAsFixed(1)}x',
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -213,16 +216,17 @@ class _CameraViewState extends State<CameraView> {
             maxHeight: 250,
           ),
           child: Column(children: [
+
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width / 1.2,
                 margin: const EdgeInsets.all(15.0),
                 padding: const EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
+
                   border: Border.all(
-                    width: kPadding / 2,
-                    color: Colors.red,
-                  ),
+                    width: kPadding/2,
+                    color: Colors.red,),
                 ),
               ),
             ),
@@ -233,8 +237,15 @@ class _CameraViewState extends State<CameraView> {
 
   Future _startLiveFeed() async {
     final camera = _cameras[_cameraIndex];
-    _controller = widget.cameraController;
-
+    _controller = CameraController(
+      camera,
+      // Set to ResolutionPreset.high. Do NOT set it to ResolutionPreset.max because for some phones does NOT work.
+      ResolutionPreset.high,
+      enableAudio: false,
+      imageFormatGroup: Platform.isAndroid
+          ? ImageFormatGroup.nv21
+          : ImageFormatGroup.bgra8888,
+    );
     _controller?.initialize().then((_) {
       if (!mounted) {
         return;

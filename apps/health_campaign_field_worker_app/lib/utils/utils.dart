@@ -15,13 +15,11 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:isar/isar.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:uuid/uuid.dart';
 
 import '../blocs/search_households/project_beneficiaries_downsync.dart';
 import '../blocs/search_households/search_households.dart';
-import '../data/local_store/no_sql/schema/localization.dart';
 import '../data/local_store/secure_store/secure_store.dart';
 import '../models/data_model.dart';
 import '../models/project_type/project_type_model.dart';
@@ -34,14 +32,14 @@ export 'app_exception.dart';
 export 'constants.dart';
 export 'extensions/extensions.dart';
 
-Expression<bool> buildAnd(Iterable<Expression<bool>> iterable) {
+Expression<bool> buildAnd(Iterable<Expression<bool?>> iterable) {
   if (iterable.isEmpty) return const Constant(true);
   final result = iterable.reduce((value, element) => value & element);
 
   return result.equals(true);
 }
 
-Expression<bool> buildOr(Iterable<Expression<bool>> iterable) {
+Expression<bool> buildOr(Iterable<Expression<bool?>> iterable) {
   if (iterable.isEmpty) return const Constant(true);
   final result = iterable.reduce((value, element) => value | element);
 
@@ -72,17 +70,7 @@ class CustomValidator {
             control.value.toString().length >= 2 ||
             control.value.toString().trim().isEmpty
         ? null
-        : {'min2': true};
-  }
-
-  static Map<String, dynamic>? requiredMin3(
-    AbstractControl<dynamic> control,
-  ) {
-    return control.value == null ||
-            control.value.toString().trim().length >= 3 ||
-            control.value.toString().trim().isEmpty
-        ? null
-        : {'min3': true};
+        : {'required': true};
   }
 
   static Map<String, dynamic>? validMobileNumber(
@@ -92,13 +80,11 @@ class CustomValidator {
       return null;
     }
 
-    const pattern = r'[0-9]';
-
-    if (control.value.toString().length != 10) {
-      return {'mobileNumber': true};
-    }
+    const pattern = r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$';
 
     if (RegExp(pattern).hasMatch(control.value.toString())) return null;
+
+    if (control.value.toString().length < 10) return {'mobileNumber': true};
 
     return {'mobileNumber': true};
   }
@@ -113,7 +99,7 @@ class CustomValidator {
     var parsed = int.tryParse(control.value) ?? 0;
     if (parsed < 0) {
       return {'min': true};
-    } else if (parsed > 1000000) {
+    } else if (parsed > 10000) {
       return {'max': true};
     }
 
@@ -138,16 +124,34 @@ performBackgroundService({
   final service = FlutterBackgroundService();
   var isRunning = await service.isRunning();
 
-  if (!stopService) {
-    if (isOnline & !isRunning) {
-      final isStarted = await service.startService();
-      if (!isStarted) {
-        await service.startService();
+  if (stopService) {
+    if (isRunning) {
+      if (!isBackground && context != null) {
+        if (context.mounted) {
+          DigitToast.show(
+            context,
+            options: DigitToastOptions(
+              'Background Service Stopped',
+              true,
+              DigitTheme.instance.mobileTheme,
+            ),
+          );
+        }
       }
     }
   } else {
-    if (isRunning) {
-      service.invoke('stopService');
+    if (!isRunning && isOnline) {
+      service.startService();
+      if (context != null) {
+        DigitToast.show(
+          context!,
+          options: DigitToastOptions(
+            'Background Service Started',
+            false,
+            DigitTheme.instance.mobileTheme,
+          ),
+        );
+      }
     }
   }
 }
@@ -198,6 +202,19 @@ double? calculateDistance(Coordinate? start, Coordinate? end) {
   }
 
   return null;
+}
+
+Timer makePeriodicTimer(
+  Duration duration,
+  void Function(Timer timer) callback, {
+  bool fireNow = false,
+}) {
+  var timer = Timer.periodic(duration, callback);
+  if (fireNow) {
+    callback(timer);
+  }
+
+  return timer;
 }
 
 final requestData = {
@@ -277,6 +294,7 @@ bool checkEligibilityForActiveCycle(
 }
 
 /*Check for if the individual falls on the valid age category*/
+
 ///  * Returns [true] if the individual is in the same cycle and is eligible for the next dose,
 bool checkEligibilityForAgeAndSideEffect(
   DigitDOBAge age,
@@ -324,25 +342,6 @@ bool checkEligibilityForAgeAndSideEffect(
   return false;
 }
 
-
-//Function to read the localizations from ISAR,
-getLocalizationString(Isar isar, String selectedLocale) async {
-  List<dynamic> localizationValues = [];
-
-  final List<LocalizationWrapper> localizationList =
-      await isar.localizationWrappers
-          .filter()
-          .localeEqualTo(
-            selectedLocale.toString(),
-          )
-          .findAll();
-  if (localizationList.isNotEmpty) {
-    localizationValues.addAll(localizationList.first.localization!);
-  }
-
-  return localizationValues;
-}
-
 bool checkIfBeneficiaryRefused(
   List<TaskModel>? tasks,
 ) {
@@ -353,24 +352,22 @@ bool checkIfBeneficiaryRefused(
   return isBeneficiaryRefused;
 }
 
-bool checkIfBeneficiaryIneligible(
-  List<TaskModel>? tasks,
-) {
-  final isBeneficiaryIneligible = (tasks != null &&
-      (tasks ?? []).isNotEmpty &&
-      tasks.last.status == Status.beneficiaryIneligible.toValue());
-
-  return isBeneficiaryIneligible;
-}
-
 bool checkIfBeneficiaryReferred(
-  List<TaskModel>? tasks,
+  List<ReferralModel>? referrals,
+  Cycle currentCycle,
 ) {
-  final isBeneficiaryReferred = (tasks != null &&
-      (tasks ?? []).isNotEmpty &&
-      tasks.last.status == Status.beneficiaryReferred.toValue());
+  if (currentCycle.startDate != null && currentCycle.endDate != null) {
+    final isBeneficiaryReferred = (referrals != null &&
+        (referrals ?? []).isNotEmpty &&
+        referrals.last.clientAuditDetails!.createdTime >=
+            currentCycle.startDate! &&
+        referrals.last.clientAuditDetails!.createdTime <=
+            currentCycle.endDate!);
 
-  return isBeneficiaryReferred;
+    return isBeneficiaryReferred;
+  } else {
+    return false;
+  }
 }
 
 bool checkStatus(
@@ -618,12 +615,9 @@ void showDownloadDialog(
           secondaryAction: model.secondaryButtonLabel != null
               ? DigitDialogActions(
                   label: model.secondaryButtonLabel ?? '',
-                  action: (ctx) async {
-                    await LocalSecureStore.instance.setManualSyncTrigger(false);
-                    if (context.mounted) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      context.router.popUntilRouteWithName(HomeRoute.name);
-                    }
+                  action: (ctx) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    context.router.popUntilRouteWithName(HomeRoute.name);
                   },
                 )
               : null,
@@ -650,4 +644,15 @@ void showDownloadDialog(
     default:
       return;
   }
+}
+
+// Returns value of the Additional Field Model, by passing the key and additional Fields list as <Map<String, dynamic>>
+dynamic getValueByKey(List<Map<String, dynamic>> data, String key) {
+  for (var map in data) {
+    if (map["key"] == key) {
+      return map["value"];
+    }
+  }
+
+  return null; // Key not found
 }

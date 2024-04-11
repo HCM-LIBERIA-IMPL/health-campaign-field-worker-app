@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../blocs/auth/auth.dart';
-import '../utils/constants.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../widgets/localized.dart';
@@ -32,7 +31,7 @@ class _LoginPageState extends LocalizedState<LoginPage> {
     Widget buildPasswordVisibility() {
       return IconButton(
         icon: Icon(
-          passwordVisible ? Icons.visibility : Icons.visibility_off,
+          passwordVisible ? Icons.visibility_off : Icons.visibility,
         ),
         onPressed: () {
           setState(() {
@@ -56,10 +55,7 @@ class _LoginPageState extends LocalizedState<LoginPage> {
               DigitToast.show(
                 context,
                 options: DigitToastOptions(
-                  message ??
-                      localizations.translate(
-                        i18.login.loginError,
-                      ),
+                  message ?? localizations.translate('UNABLE_TO_LOGIN'),
                   true,
                   theme,
                 ),
@@ -68,9 +64,6 @@ class _LoginPageState extends LocalizedState<LoginPage> {
           );
         },
         child: ScrollableContent(
-          footer: PoweredByDigit(
-            version: Constants().version,
-          ),
           children: [
             ReactiveFormBuilder(
               form: buildForm,
@@ -153,6 +146,9 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                           );
                         },
                       ),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       TextButton(
                         onPressed: () => DigitDialog.show(
                           context,
@@ -172,6 +168,11 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                                       .pop(),
                             ),
                           ),
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          minimumSize: const Size(0, 0),
                         ),
                         child: Center(
                           child: Text(
@@ -194,12 +195,12 @@ class _LoginPageState extends LocalizedState<LoginPage> {
 
   FormGroup buildForm() => fb.group(<String, Object>{
         _userId: FormControl<String>(
-          // value: 'zumbo-moni17-reg1',
+          value: 'HFworker',
           validators: [Validators.required],
         ),
         _password: FormControl<String>(
           validators: [Validators.required],
-          // value: 'egov@4321',
+          value: 'eGov@1234',
         ),
       });
 }

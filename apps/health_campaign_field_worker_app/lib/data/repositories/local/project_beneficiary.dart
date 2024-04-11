@@ -1,24 +1,23 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+
 import '../../../models/data_model.dart';
 import '../../../utils/utils.dart';
-import 'base/project_beneficiary_base.dart';
+import '../../data_repository.dart';
 
-class ProjectBeneficiaryLocalRepository
-    extends ProjectBeneficiaryLocalBaseRepository {
+class ProjectBeneficiaryLocalRepository extends LocalRepository<
+    ProjectBeneficiaryModel, ProjectBeneficiarySearchModel> {
   ProjectBeneficiaryLocalRepository(super.sql, super.opLogManager);
 
   void listenToChanges({
     required ProjectBeneficiarySearchModel query,
     required void Function(List<ProjectBeneficiaryModel> data) listener,
-    String? userId,
-  }) async {
+  }) {
     final select = sql.select(sql.projectBeneficiary)
       ..where(
         (tbl) => buildOr([
-          if (userId != null) tbl.auditCreatedBy.equals(userId),
-          if (query.projectId != null) tbl.projectId.equals(query.projectId!),
+          if (query.projectId != null) tbl.projectId.equals(query.projectId),
           if (query.beneficiaryRegistrationDateGte != null)
             tbl.dateOfRegistration.isBiggerOrEqualValue(
               query.beneficiaryRegistrationDateGte!.millisecondsSinceEpoch,
@@ -43,12 +42,6 @@ class ProjectBeneficiaryLocalRepository
           rowVersion: e.rowVersion,
           isDeleted: e.isDeleted,
           beneficiaryId: e.beneficiaryId,
-          auditDetails: (e.auditCreatedBy != null && e.auditCreatedTime != null)
-              ? AuditDetails(
-                  createdBy: e.auditCreatedBy!,
-                  createdTime: e.auditCreatedTime!,
-                )
-              : null,
         );
       }).toList();
 
@@ -84,7 +77,7 @@ class ProjectBeneficiaryLocalRepository
               [
                 if (query.tag != null)
                   sql.projectBeneficiary.tag.equals(
-                    query.tag!,
+                    query.tag,
                   ),
                 if (query.clientReferenceId != null)
                   sql.projectBeneficiary.clientReferenceId.isIn(
@@ -95,19 +88,19 @@ class ProjectBeneficiaryLocalRepository
                       .isIn(query.beneficiaryClientReferenceId!),
                 if (query.id != null)
                   sql.projectBeneficiary.id.equals(
-                    query.id!,
+                    query.id,
                   ),
                 if (query.projectId != null)
                   sql.projectBeneficiary.projectId.equals(
-                    query.projectId!,
+                    query.projectId,
                   ),
                 if (query.beneficiaryId != null)
                   sql.projectBeneficiary.beneficiaryId.equals(
-                    query.beneficiaryId!,
+                    query.beneficiaryId,
                   ),
                 if (query.dateOfRegistrationTime != null)
                   sql.projectBeneficiary.dateOfRegistration.equals(
-                    query.dateOfRegistration!,
+                    query.dateOfRegistration,
                   ),
                 if (userId != null)
                   sql.projectBeneficiary.auditCreatedBy.equals(
@@ -166,7 +159,7 @@ class ProjectBeneficiaryLocalRepository
       batch.insert(sql.projectBeneficiary, projectBeneficiaryCompanion);
     });
 
-    await super.create(entity, createOpLog: createOpLog);
+    await super.create(entity);
   }
 
   @override
@@ -219,4 +212,7 @@ class ProjectBeneficiaryLocalRepository
 
     return super.delete(updated);
   }
+
+  @override
+  DataModelType get type => DataModelType.projectBeneficiary;
 }

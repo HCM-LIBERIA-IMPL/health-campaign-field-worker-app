@@ -52,9 +52,6 @@ class AppConfiguration {
   @Name('DELIVERY_COMMENT_OPTIONS_POPULATOR')
   late List<DeliveryCommentOptions>? deliveryCommentOptions;
 
-  @Name('DELIVERY_COMMENT_OPTIONS_SMC_POPULATOR')
-  late List<DeliveryCommentOptions>? deliveryCommentOptionsSmc;
-
   @Name('TRANSPORT_TYPES')
   late List<TransportTypes>? transportTypes;
 
@@ -68,13 +65,11 @@ class AppConfiguration {
   late String? tenantId;
 
   @Name('FIREBASE_CONFIG')
-  late FirebaseConfig? firebaseConfig;
+  FirebaseConfig? firebaseConfig;
 
   late List<SymptomsTypes>? symptomsTypes;
 
   late List<ReferralReasons>? referralReasons;
-
-  late List<IneligibilityReasons>? ineligibilityReasons;
 }
 
 @embedded
@@ -179,11 +174,8 @@ class CallSupportList {
 
 @embedded
 class FirebaseConfig {
-  @Name("enableCrashlytics")
-  late bool? enableCrashlytics;
-
-  @Name("enableAnalytics")
-  late bool? enableAnalytics;
+  bool? enableCrashlytics;
+  bool? enableAnalytics;
 }
 
 @embedded
@@ -195,13 +187,6 @@ class SymptomsTypes {
 
 @embedded
 class ReferralReasons {
-  late String code;
-  late String name;
-  late bool active;
-}
-
-@embedded
-class IneligibilityReasons {
   late String code;
   late String name;
   late bool active;

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/project/project.dart';
 import '../../blocs/search_households/search_households.dart';
 import '../../models/data_model.dart';
+import '../../models/project_type/project_type_model.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/utils.dart';
 import '../localized.dart';
@@ -57,37 +58,26 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
 
     final headerList = [
       TableHeader(
-        localizations.translate(
-          i18.beneficiaryDetails.beneficiary,
-        ),
+        localizations.translate(i18.beneficiaryDetails.beneficiaryHeader),
         cellKey: 'beneficiary',
       ),
       TableHeader(
-        localizations.translate(
-          i18.beneficiaryDetails.beneficiaryStatus,
-        ),
+        localizations.translate(i18.beneficiaryDetails.deliveryHeader),
         cellKey: 'delivery',
       ),
       TableHeader(
-        localizations.translate(
-          i18.common.coreCommonAge,
-        ),
+        localizations.translate(i18.individualDetails.ageLabelText),
         cellKey: 'age',
       ),
       TableHeader(
-        localizations.translate(
-          i18.common.coreCommonGender,
-        ),
+        localizations.translate(i18.common.coreCommonGender),
         cellKey: 'gender',
       ),
     ];
-    final filteredHeaderList =
-        context.beneficiaryType != BeneficiaryType.individual
-            ? headerList
-                .where((element) =>
-                    element.cellKey != 'delivery' && element.cellKey != 'age')
-                .toList()
-            : headerList;
+    final filteredHeaderList = context.beneficiaryType !=
+            BeneficiaryType.individual
+        ? headerList.where((element) => element.cellKey != 'delivery').toList()
+        : headerList;
     final bloc = context.read<ProjectBloc>().state;
     final currentCycle = bloc.projectType?.cycles?.firstWhereOrNull(
       (e) =>
@@ -109,16 +99,20 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
                     )
                     .toList();
 
-        final taskdata = householdMember.tasks
-            ?.where((element) =>
-                element.projectBeneficiaryClientReferenceId ==
-                projectBeneficiary.first.clientReferenceId)
-            .toList();
-        final referralData = householdMember.referrals
-            ?.where((element) =>
-                element.projectBeneficiaryClientReferenceId ==
-                projectBeneficiary.first.clientReferenceId)
-            .toList();
+        final taskdata = projectBeneficiary.isNotEmpty
+            ? householdMember.tasks
+                ?.where((element) =>
+                    element.projectBeneficiaryClientReferenceId ==
+                    projectBeneficiary.first.clientReferenceId)
+                .toList()
+            : null;
+        final referralData = projectBeneficiary.isNotEmpty
+            ? householdMember.referrals
+                ?.where((element) =>
+                    element.projectBeneficiaryClientReferenceId ==
+                    projectBeneficiary.first.clientReferenceId)
+                .toList()
+            : null;
         final sideEffects = taskdata != null && taskdata.isNotEmpty
             ? householdMember.sideEffects
                 ?.where((element) =>
@@ -126,22 +120,23 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
                     taskdata.last.clientReferenceId)
                 .toList()
             : null;
-        final ageInYears = DigitDateUtils.calculateAge(
-          e.dateOfBirth != null
-              ? DigitDateUtils.getFormattedDateToDateTime(
-                    e.dateOfBirth!,
-                  ) ??
-                  DateTime.now()
-              : DateTime.now(),
-        ).years;
-        final ageInMonths = DigitDateUtils.calculateAge(
-          e.dateOfBirth != null
-              ? DigitDateUtils.getFormattedDateToDateTime(
-                    e.dateOfBirth!,
-                  ) ??
-                  DateTime.now()
-              : DateTime.now(),
-        ).months;
+  
+    final ageInYears = DigitDateUtils.calculateAge(
+      householdMember.headOfHousehold.dateOfBirth != null
+          ? DigitDateUtils.getFormattedDateToDateTime(
+                householdMember.headOfHousehold.dateOfBirth!,
+              ) ??
+              DateTime.now()
+          : DateTime.now(),
+    ).years;
+    final ageInMonths = DigitDateUtils.calculateAge(
+      householdMember.headOfHousehold.dateOfBirth != null
+          ? DigitDateUtils.getFormattedDateToDateTime(
+                householdMember.headOfHousehold.dateOfBirth!,
+              ) ??
+              DateTime.now()
+          : DateTime.now(),
+    ).months;
 
         final isNotEligible = !checkEligibilityForAgeAndSideEffect(
           DigitDOBAge(
@@ -157,44 +152,34 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
           (taskdata ?? []).isNotEmpty ? taskdata?.last : null,
           sideEffects,
         );
-        final isBeneficiaryRefused = checkIfBeneficiaryRefused(taskdata) &&
-            !checkStatus(taskdata, currentCycle);
-        final isBeneficiaryIneligible = checkIfBeneficiaryIneligible(
-              taskdata,
-            ) &&
-            !checkStatus(taskdata, currentCycle);
+        final isBeneficiaryRefused = checkIfBeneficiaryRefused(taskdata);
         final isBeneficiaryReferred = checkIfBeneficiaryReferred(
-          taskdata,
+          referralData,
+          currentCycle ?? const Cycle(),
         );
-
-        final isHead = e.clientReferenceId ==
-            householdMember.headOfHousehold.clientReferenceId;
 
 // TODO need to pass the current cycle
 
         final isStatusReset = checkStatus(taskdata, currentCycle);
 
         final rowTableData = [
-          TableData( 
+          TableData(
             [
               e.name?.givenName,
               e.name?.familyName,
-            ].whereNotNull().join(' '),
+            ].whereNotNull().join('-'),
             cellKey: 'beneficiary',
           ),
           TableData(
-            isHead
-                ? localizations.translate(
-                    i18.householdOverView.householdOverViewHouseholderHeadLabel,
-                  )
-                : getTableCellText(
-                    isNotEligible,
-                    taskdata,
-                    isBeneficiaryRefused,
-                    isBeneficiaryIneligible,
-                    isBeneficiaryReferred,
-                    isStatusReset,
-                  ),
+            getTableCellText(
+              StatusKeys(
+                isNotEligible,
+                isBeneficiaryRefused,
+                isBeneficiaryReferred,
+                isStatusReset,
+              ),
+              taskdata,
+            ),
             cellKey: 'delivery',
             style: TextStyle(
               color: getTableCellTextColor(
@@ -202,7 +187,6 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
                 taskdata: taskdata,
                 isBeneficiaryRefused:
                     isBeneficiaryRefused || isBeneficiaryReferred,
-                isBeneficiaryIneligible: isBeneficiaryIneligible,
                 isStatusReset: isStatusReset,
                 theme: theme,
               ),
@@ -225,7 +209,7 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
             cellKey: 'age',
           ),
           TableData(
-            localizations.translate(e.gender?.name.toUpperCase() ?? '--'),
+            e.gender?.name ?? '--',
             cellKey: 'gender',
           ),
         ];
@@ -233,14 +217,14 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
         return TableDataRow(
           context.beneficiaryType != BeneficiaryType.individual
               ? rowTableData
-                  .where((element) =>
-                      element.cellKey != 'delivery' && element.cellKey != 'age')
+                  .where((element) => element.cellKey != 'delivery')
                   .toList()
               : rowTableData,
         );
         // rowTableData
       },
     ).toList();
+
 
     final ageInYears = DigitDateUtils.calculateAge(
       householdMember.headOfHousehold.dateOfBirth != null
@@ -270,17 +254,7 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
     );
 
     final isBeneficiaryRefused =
-        checkIfBeneficiaryRefused(householdMember.tasks) &&
-            !checkStatus(householdMember.tasks, currentCycle);
-
-    final isBeneficiaryIneligible = checkIfBeneficiaryIneligible(
-          householdMember.tasks,
-        ) &&
-        !checkStatus(householdMember.tasks, currentCycle);
-
-    final isBeneficiaryReferred = checkIfBeneficiaryReferred(
-      householdMember.tasks,
-    );
+        checkIfBeneficiaryRefused(householdMember.tasks);
 
     return DigitCard(
       child: Column(
@@ -301,21 +275,30 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
                     householdMember.household.address?.pincode,
                   ].whereNotNull().take(2).join(' '),
                   subtitle: widget.distance != null
-                      ? '${householdMember.household.memberCount ?? 1} ${householdMember.household.memberCount == 1 ? localizations.translate(i18.memberCard.householdMemberText) : localizations.translate(i18.memberCard.householdMembersText)}  \n ${((widget.distance!) * 1000).round() > 999 ? '(${((widget.distance!).round())} km)' : '(${((widget.distance!) * 1000).round()} mts) ${localizations.translate(i18.beneficiaryDetails.fromCurrentLocation)}'}'
-                      : '${householdMember.members.length ?? 1} ${householdMember.members.length == 1 ? localizations.translate(i18.memberCard.householdMemberText) : localizations.translate(i18.memberCard.householdMembersText)}',
-                  status: context.beneficiaryType != BeneficiaryType.individual
-                      ? (householdMember.tasks ?? []).isNotEmpty
+                      ? '${householdMember.members.length ?? 1} ${householdMember.members.length == 1 ? 'Household Member' : 'Household Members'}\n${((widget.distance!) * 1000).round() > 999 ? '(${((widget.distance!).round())} km)' : '(${((widget.distance!) * 1000).round()} mts) ${localizations.translate(i18.beneficiaryDetails.fromCurrentLocation)}'}'
+                      : '${householdMember.members.length ?? 1} ${householdMember.members.length == 1 ? 'Household Member' : 'Household Members'}',
+                  status: context.beneficiaryType == BeneficiaryType.individual
+                      ? (householdMember.tasks ?? []).isNotEmpty &&
+                              !isNotEligible &&
+                              !isBeneficiaryRefused
                           ? Status.visited.toValue()
                           : Status.notVisited.toValue()
-                      : null,
+                      : (householdMember.tasks ?? []).isNotEmpty
+                          ? Status.visited.toValue()
+                          : Status.notVisited.toValue(),
                   title: [
                     householdMember.headOfHousehold.name?.givenName,
                     householdMember.headOfHousehold.name?.familyName,
-                  ].whereNotNull().join(' '),
+                  ].whereNotNull().join(''),
                 ),
               ),
               Flexible(
                 child: DigitOutLineButton(
+                  buttonStyle: OutlinedButton.styleFrom(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                  ),
                   label:
                       localizations.translate(i18.searchBeneficiary.iconLabel),
                   onPressed: widget.onOpenPressed,
@@ -329,11 +312,12 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
               headerList: filteredHeaderList,
               tableData: tableData,
               columnWidth: 130,
+              columnRowFixedHeight: 65,
               height: householdMember.members.length == 1
-                  ? 61 * 2
+                  ? 65 * 2
                   : householdMember.members.length <= 4
-                      ? (householdMember.members.length + 1) * 58
-                      : 5 * 60,
+                      ? (householdMember.members.length + 1) * 65
+                      : 5 * 68,
               scrollPhysics: householdMember.members.length <= 4
                   ? const NeverScrollableScrollPhysics()
                   : const ClampingScrollPhysics(),
@@ -348,7 +332,7 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
                 isCardExpanded
                     ? Icons.keyboard_arrow_up
                     : Icons.keyboard_arrow_down,
-                size: 16,
+                size: 24,
               ),
               onPressed: () => isCardExpanded = !isCardExpanded,
             ),
@@ -359,25 +343,19 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
   }
 
   String getTableCellText(
-    bool isNotEligible,
-    List<TaskModel>? taskdata,
-    bool isBeneficiaryRefused,
-    bool isBeneficiaryIneligible,
-    bool isBeneficiaryReferred,
-    bool isStatusReset,
+    StatusKeys statusKeys,
+    List<TaskModel>? taskData,
   ) {
-    if (isNotEligible || isBeneficiaryIneligible) {
-      return localizations.translate(
-          i18.householdOverView.householdOverViewNotEligibleIconLabel);
-    } else if (isBeneficiaryReferred) {
-      return localizations.translate(
-          i18.householdOverView.householdOverViewBeneficiaryReferredLabel);
-    } else if (taskdata != null) {
-      if (taskdata.isEmpty) {
+    if (statusKeys.isNotEligible) {
+      return 'Not Eligible';
+    } else if (statusKeys.isBeneficiaryReferred) {
+      return localizations.translate(Status.beneficiaryReferred.toValue());
+    } else if (taskData != null) {
+      if (taskData.isEmpty) {
         return localizations.translate(Status.notVisited.toValue());
-      } else if (isBeneficiaryRefused && !isStatusReset) {
+      } else if (statusKeys.isBeneficiaryRefused && !statusKeys.isStatusReset) {
         return localizations.translate(Status.beneficiaryRefused.toValue());
-      } else if (isStatusReset) {
+      } else if (statusKeys.isStatusReset) {
         return localizations.translate(Status.notVisited.toValue());
       } else {
         return localizations.translate(Status.visited.toValue());
@@ -392,7 +370,6 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
     required bool isNotEligible,
     required List<TaskModel>? taskdata,
     required bool isBeneficiaryRefused,
-    required bool isBeneficiaryIneligible,
     required bool isStatusReset,
     required ThemeData theme,
   }) {
@@ -400,7 +377,6 @@ class _ViewBeneficiaryCardState extends LocalizedState<ViewBeneficiaryCard> {
             taskdata.isNotEmpty &&
             !isBeneficiaryRefused &&
             !isNotEligible &&
-            !isBeneficiaryIneligible &&
             !isStatusReset
         ? theme.colorScheme.onSurfaceVariant
         : theme.colorScheme.error;

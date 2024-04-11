@@ -19,8 +19,6 @@ class DetectorView extends StatefulWidget {
     this.onCameraFeedReady,
     this.onDetectorViewModeChanged,
     this.onCameraLensDirectionChanged,
-    required this.cameraController,
-    required this.cameras,
   }) : super(key: key);
 
   final String title;
@@ -32,8 +30,6 @@ class DetectorView extends StatefulWidget {
   final Function(DetectorViewMode mode)? onDetectorViewModeChanged;
   final Function(CameraLensDirection direction)? onCameraLensDirectionChanged;
   final CameraLensDirection initialCameraLensDirection;
-  final CameraController? cameraController;
-  final List<CameraDescription> cameras;
 
   @override
   State<DetectorView> createState() => _DetectorViewState();
@@ -57,8 +53,6 @@ class _DetectorViewState extends State<DetectorView> {
             onDetectorViewModeChanged: _onDetectorViewModeChanged,
             initialCameraLensDirection: widget.initialCameraLensDirection,
             onCameraLensDirectionChanged: widget.onCameraLensDirectionChanged,
-            cameraController: widget.cameraController,
-            cameras: widget.cameras,
           );
    
   }

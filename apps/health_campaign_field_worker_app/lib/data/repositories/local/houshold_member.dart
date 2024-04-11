@@ -4,10 +4,10 @@ import 'package:drift/drift.dart';
 
 import '../../../models/data_model.dart';
 import '../../../utils/utils.dart';
-import 'base/household_member_base.dart';
+import '../../data_repository.dart';
 
 class HouseholdMemberLocalRepository
-    extends HouseholdMemberLocalBaseRepository {
+    extends LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel> {
   HouseholdMemberLocalRepository(super.sql, super.opLogManager);
 
   @override
@@ -20,33 +20,33 @@ class HouseholdMemberLocalRepository
           ..where(
             buildAnd(
               [
-                if (query.householdClientReferenceIds != null)
+                                if (query.householdClientReferenceIds != null)
                   sql.householdMember.householdClientReferenceId.isIn(
                     query.householdClientReferenceIds!,
                   ),
-                if (query.individualClientReferenceIds != null)
+                       if (query.individualClientReferenceIds != null)
                   sql.householdMember.individualClientReferenceId.isIn(
                     query.individualClientReferenceIds!,
                   ),
                 if (query.householdClientReferenceId != null)
                   sql.householdMember.householdClientReferenceId.equals(
-                    query.householdClientReferenceId!,
+                    query.householdClientReferenceId,
                   ),
                 if (query.individualClientReferenceId != null)
                   sql.householdMember.individualClientReferenceId.equals(
-                    query.individualClientReferenceId!,
+                    query.individualClientReferenceId,
                   ),
                 if (query.householdId != null)
                   sql.householdMember.householdId.equals(
-                    query.householdId!,
+                    query.householdId,
                   ),
                 if (query.individualId != null)
                   sql.householdMember.individualId.equals(
-                    query.individualId!,
+                    query.individualId,
                   ),
                 if (query.isHeadOfHousehold != null)
                   sql.householdMember.isHeadOfHousehold.equals(
-                    query.isHeadOfHousehold!,
+                    query.isHeadOfHousehold,
                   ),
                 if (userId != null)
                   sql.householdMember.auditCreatedBy.equals(
@@ -175,6 +175,9 @@ class HouseholdMemberLocalRepository
       );
     });
 
-    return super.delete(updated, createOpLog: createOpLog);
+    return super.delete(updated);
   }
+
+  @override
+  DataModelType get type => DataModelType.householdMember;
 }

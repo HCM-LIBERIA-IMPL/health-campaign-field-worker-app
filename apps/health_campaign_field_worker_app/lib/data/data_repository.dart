@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:dart_mappable/dart_mappable.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:dio/dio.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../models/data_model.dart';
@@ -98,15 +96,8 @@ abstract class RemoteRepository<D extends EntityModel,
           );
         },
       );
-    } on DioError catch (error) {
-      if (error.response == null ||
-          error.response!.data['Errors'][0]['message']
-              .toString()
-              .contains(Constants.invalidAccessTokenKey)) {
-        rethrow;
-      } else {
-        return [];
-      }
+    } catch (error) {
+      return [];
     }
 
     final responseMap = (response.data);
@@ -146,7 +137,7 @@ abstract class RemoteRepository<D extends EntityModel,
 
     final entityList = entityResponse.whereType<Map<String, dynamic>>();
 
-    return entityList.map((e) => MapperContainer.globals.fromMap<D>(e)).toList();
+    return entityList.map((e) => Mapper.fromMap<D>(e)).toList();
   }
 
   FutureOr<Response> singleCreate(D entity) async {
@@ -353,7 +344,7 @@ abstract class RemoteRepository<D extends EntityModel,
   }
 
   List<Map<String, dynamic>> _getMap(List<EntityModel> entities) {
-    return entities.map((e) => MapperContainer.globals.toMap(e)).toList();
+    return entities.map((e) => Mapper.toMap(e)).toList();
   }
 
   FutureOr<T> executeFuture<T>({
@@ -410,8 +401,6 @@ abstract class LocalRepository<D extends EntityModel,
 
   const LocalRepository(this.sql, this.opLogManager);
 
-  TableInfo get table;
-
   @override
   @mustCallSuper
   FutureOr<void> create(
@@ -436,10 +425,6 @@ abstract class LocalRepository<D extends EntityModel,
     if (createOpLog) await createOplogEntry(entity, DataOperation.delete);
   }
 
-  FutureOr<void> deleteAll() async {
-    await sql.deleteFromTable(table);
-  }
-
   FutureOr<void> createOplogEntry(D entity, DataOperation operation) async {
     final auditDetails = entity.auditDetails;
     if (auditDetails == null) {
@@ -449,7 +434,7 @@ abstract class LocalRepository<D extends EntityModel,
       entity,
       operation,
       createdAt: DateTime.now(),
-      createdBy: auditDetails.lastModifiedBy,
+      createdBy: entity.clientAuditDetails?.lastModifiedBy ?? '',
       type: type,
     );
 

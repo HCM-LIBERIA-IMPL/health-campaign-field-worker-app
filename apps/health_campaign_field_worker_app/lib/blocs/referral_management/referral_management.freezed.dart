@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'referral_management.dart';
 
@@ -12,7 +12,7 @@ part of 'referral_management.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$ReferralEvent {
@@ -76,20 +76,20 @@ class _$ReferralEventCopyWithImpl<$Res, $Val extends ReferralEvent>
 }
 
 /// @nodoc
-abstract class _$$ReferralSubmitEventImplCopyWith<$Res> {
-  factory _$$ReferralSubmitEventImplCopyWith(_$ReferralSubmitEventImpl value,
-          $Res Function(_$ReferralSubmitEventImpl) then) =
-      __$$ReferralSubmitEventImplCopyWithImpl<$Res>;
+abstract class _$$ReferralSubmitEventCopyWith<$Res> {
+  factory _$$ReferralSubmitEventCopyWith(_$ReferralSubmitEvent value,
+          $Res Function(_$ReferralSubmitEvent) then) =
+      __$$ReferralSubmitEventCopyWithImpl<$Res>;
   @useResult
   $Res call({ReferralModel referral, bool isEditing});
 }
 
 /// @nodoc
-class __$$ReferralSubmitEventImplCopyWithImpl<$Res>
-    extends _$ReferralEventCopyWithImpl<$Res, _$ReferralSubmitEventImpl>
-    implements _$$ReferralSubmitEventImplCopyWith<$Res> {
-  __$$ReferralSubmitEventImplCopyWithImpl(_$ReferralSubmitEventImpl _value,
-      $Res Function(_$ReferralSubmitEventImpl) _then)
+class __$$ReferralSubmitEventCopyWithImpl<$Res>
+    extends _$ReferralEventCopyWithImpl<$Res, _$ReferralSubmitEvent>
+    implements _$$ReferralSubmitEventCopyWith<$Res> {
+  __$$ReferralSubmitEventCopyWithImpl(
+      _$ReferralSubmitEvent _value, $Res Function(_$ReferralSubmitEvent) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -98,7 +98,7 @@ class __$$ReferralSubmitEventImplCopyWithImpl<$Res>
     Object? referral = null,
     Object? isEditing = null,
   }) {
-    return _then(_$ReferralSubmitEventImpl(
+    return _then(_$ReferralSubmitEvent(
       null == referral
           ? _value.referral
           : referral // ignore: cast_nullable_to_non_nullable
@@ -113,8 +113,8 @@ class __$$ReferralSubmitEventImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ReferralSubmitEventImpl implements ReferralSubmitEvent {
-  const _$ReferralSubmitEventImpl(this.referral, this.isEditing);
+class _$ReferralSubmitEvent implements ReferralSubmitEvent {
+  const _$ReferralSubmitEvent(this.referral, this.isEditing);
 
   @override
   final ReferralModel referral;
@@ -127,10 +127,10 @@ class _$ReferralSubmitEventImpl implements ReferralSubmitEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralSubmitEventImpl &&
+            other is _$ReferralSubmitEvent &&
             (identical(other.referral, referral) ||
                 other.referral == referral) &&
             (identical(other.isEditing, isEditing) ||
@@ -143,8 +143,8 @@ class _$ReferralSubmitEventImpl implements ReferralSubmitEvent {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralSubmitEventImplCopyWith<_$ReferralSubmitEventImpl> get copyWith =>
-      __$$ReferralSubmitEventImplCopyWithImpl<_$ReferralSubmitEventImpl>(
+  _$$ReferralSubmitEventCopyWith<_$ReferralSubmitEvent> get copyWith =>
+      __$$ReferralSubmitEventCopyWithImpl<_$ReferralSubmitEvent>(
           this, _$identity);
 
   @override
@@ -214,30 +214,30 @@ class _$ReferralSubmitEventImpl implements ReferralSubmitEvent {
 abstract class ReferralSubmitEvent implements ReferralEvent {
   const factory ReferralSubmitEvent(
           final ReferralModel referral, final bool isEditing) =
-      _$ReferralSubmitEventImpl;
+      _$ReferralSubmitEvent;
 
   ReferralModel get referral;
   bool get isEditing;
   @JsonKey(ignore: true)
-  _$$ReferralSubmitEventImplCopyWith<_$ReferralSubmitEventImpl> get copyWith =>
+  _$$ReferralSubmitEventCopyWith<_$ReferralSubmitEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ReferralSearchEventImplCopyWith<$Res> {
-  factory _$$ReferralSearchEventImplCopyWith(_$ReferralSearchEventImpl value,
-          $Res Function(_$ReferralSearchEventImpl) then) =
-      __$$ReferralSearchEventImplCopyWithImpl<$Res>;
+abstract class _$$ReferralSearchEventCopyWith<$Res> {
+  factory _$$ReferralSearchEventCopyWith(_$ReferralSearchEvent value,
+          $Res Function(_$ReferralSearchEvent) then) =
+      __$$ReferralSearchEventCopyWithImpl<$Res>;
   @useResult
   $Res call({ReferralSearchModel referrals});
 }
 
 /// @nodoc
-class __$$ReferralSearchEventImplCopyWithImpl<$Res>
-    extends _$ReferralEventCopyWithImpl<$Res, _$ReferralSearchEventImpl>
-    implements _$$ReferralSearchEventImplCopyWith<$Res> {
-  __$$ReferralSearchEventImplCopyWithImpl(_$ReferralSearchEventImpl _value,
-      $Res Function(_$ReferralSearchEventImpl) _then)
+class __$$ReferralSearchEventCopyWithImpl<$Res>
+    extends _$ReferralEventCopyWithImpl<$Res, _$ReferralSearchEvent>
+    implements _$$ReferralSearchEventCopyWith<$Res> {
+  __$$ReferralSearchEventCopyWithImpl(
+      _$ReferralSearchEvent _value, $Res Function(_$ReferralSearchEvent) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -245,7 +245,7 @@ class __$$ReferralSearchEventImplCopyWithImpl<$Res>
   $Res call({
     Object? referrals = null,
   }) {
-    return _then(_$ReferralSearchEventImpl(
+    return _then(_$ReferralSearchEvent(
       null == referrals
           ? _value.referrals
           : referrals // ignore: cast_nullable_to_non_nullable
@@ -256,8 +256,8 @@ class __$$ReferralSearchEventImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ReferralSearchEventImpl implements ReferralSearchEvent {
-  const _$ReferralSearchEventImpl(this.referrals);
+class _$ReferralSearchEvent implements ReferralSearchEvent {
+  const _$ReferralSearchEvent(this.referrals);
 
   @override
   final ReferralSearchModel referrals;
@@ -268,10 +268,10 @@ class _$ReferralSearchEventImpl implements ReferralSearchEvent {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralSearchEventImpl &&
+            other is _$ReferralSearchEvent &&
             (identical(other.referrals, referrals) ||
                 other.referrals == referrals));
   }
@@ -282,8 +282,8 @@ class _$ReferralSearchEventImpl implements ReferralSearchEvent {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralSearchEventImplCopyWith<_$ReferralSearchEventImpl> get copyWith =>
-      __$$ReferralSearchEventImplCopyWithImpl<_$ReferralSearchEventImpl>(
+  _$$ReferralSearchEventCopyWith<_$ReferralSearchEvent> get copyWith =>
+      __$$ReferralSearchEventCopyWithImpl<_$ReferralSearchEvent>(
           this, _$identity);
 
   @override
@@ -352,11 +352,11 @@ class _$ReferralSearchEventImpl implements ReferralSearchEvent {
 
 abstract class ReferralSearchEvent implements ReferralEvent {
   const factory ReferralSearchEvent(final ReferralSearchModel referrals) =
-      _$ReferralSearchEventImpl;
+      _$ReferralSearchEvent;
 
   ReferralSearchModel get referrals;
   @JsonKey(ignore: true)
-  _$$ReferralSearchEventImplCopyWith<_$ReferralSearchEventImpl> get copyWith =>
+  _$$ReferralSearchEventCopyWith<_$ReferralSearchEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -415,22 +415,22 @@ class _$ReferralStateCopyWithImpl<$Res, $Val extends ReferralState>
 }
 
 /// @nodoc
-abstract class _$$ReferralStateImplCopyWith<$Res>
+abstract class _$$_ReferralStateCopyWith<$Res>
     implements $ReferralStateCopyWith<$Res> {
-  factory _$$ReferralStateImplCopyWith(
-          _$ReferralStateImpl value, $Res Function(_$ReferralStateImpl) then) =
-      __$$ReferralStateImplCopyWithImpl<$Res>;
+  factory _$$_ReferralStateCopyWith(
+          _$_ReferralState value, $Res Function(_$_ReferralState) then) =
+      __$$_ReferralStateCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({bool loading, bool isEditing, List<ReferralModel>? referrals});
 }
 
 /// @nodoc
-class __$$ReferralStateImplCopyWithImpl<$Res>
-    extends _$ReferralStateCopyWithImpl<$Res, _$ReferralStateImpl>
-    implements _$$ReferralStateImplCopyWith<$Res> {
-  __$$ReferralStateImplCopyWithImpl(
-      _$ReferralStateImpl _value, $Res Function(_$ReferralStateImpl) _then)
+class __$$_ReferralStateCopyWithImpl<$Res>
+    extends _$ReferralStateCopyWithImpl<$Res, _$_ReferralState>
+    implements _$$_ReferralStateCopyWith<$Res> {
+  __$$_ReferralStateCopyWithImpl(
+      _$_ReferralState _value, $Res Function(_$_ReferralState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -440,7 +440,7 @@ class __$$ReferralStateImplCopyWithImpl<$Res>
     Object? isEditing = null,
     Object? referrals = freezed,
   }) {
-    return _then(_$ReferralStateImpl(
+    return _then(_$_ReferralState(
       loading: null == loading
           ? _value.loading
           : loading // ignore: cast_nullable_to_non_nullable
@@ -459,8 +459,8 @@ class __$$ReferralStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ReferralStateImpl implements _ReferralState {
-  const _$ReferralStateImpl(
+class _$_ReferralState implements _ReferralState {
+  const _$_ReferralState(
       {this.loading = false,
       this.isEditing = false,
       final List<ReferralModel>? referrals})
@@ -477,7 +477,6 @@ class _$ReferralStateImpl implements _ReferralState {
   List<ReferralModel>? get referrals {
     final value = _referrals;
     if (value == null) return null;
-    if (_referrals is EqualUnmodifiableListView) return _referrals;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -488,10 +487,10 @@ class _$ReferralStateImpl implements _ReferralState {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralStateImpl &&
+            other is _$_ReferralState &&
             (identical(other.loading, loading) || other.loading == loading) &&
             (identical(other.isEditing, isEditing) ||
                 other.isEditing == isEditing) &&
@@ -506,15 +505,15 @@ class _$ReferralStateImpl implements _ReferralState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralStateImplCopyWith<_$ReferralStateImpl> get copyWith =>
-      __$$ReferralStateImplCopyWithImpl<_$ReferralStateImpl>(this, _$identity);
+  _$$_ReferralStateCopyWith<_$_ReferralState> get copyWith =>
+      __$$_ReferralStateCopyWithImpl<_$_ReferralState>(this, _$identity);
 }
 
 abstract class _ReferralState implements ReferralState {
   const factory _ReferralState(
       {final bool loading,
       final bool isEditing,
-      final List<ReferralModel>? referrals}) = _$ReferralStateImpl;
+      final List<ReferralModel>? referrals}) = _$_ReferralState;
 
   @override
   bool get loading;
@@ -524,6 +523,6 @@ abstract class _ReferralState implements ReferralState {
   List<ReferralModel>? get referrals;
   @override
   @JsonKey(ignore: true)
-  _$$ReferralStateImplCopyWith<_$ReferralStateImpl> get copyWith =>
+  _$$_ReferralStateCopyWith<_$_ReferralState> get copyWith =>
       throw _privateConstructorUsedError;
 }

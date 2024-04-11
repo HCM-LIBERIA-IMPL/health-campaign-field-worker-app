@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/utils/date_utils.dart';
-import 'package:digit_components/widgets/atoms/digit_reactive_search_dropdown.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_components/widgets/digit_sync_dialog.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +63,13 @@ class _BoundarySelectionPageState
 
   @override
   Widget build(BuildContext context) {
+    bool isDistributor = context.loggedInUserRoles
+        .where(
+          (role) => role.code == RolesType.distributor.toValue(),
+        )
+        .toList()
+        .isNotEmpty;
+
     return WillPopScope(
       onWillPop: () async => shouldPop,
       child: BlocBuilder<BoundaryBloc, BoundaryState>(
@@ -147,18 +153,11 @@ class _BoundarySelectionPageState
                                         // Call the resetChildDropdowns function when a parent dropdown is selected
                                         resetChildDropdowns(label, state);
                                       },
-                                      isRequired:
-                                          context.isAllBoundaryMandatory ||
-                                                  labelIndex == 0
-                                              ? true
-                                              : false,
+                                      isRequired: true,
                                       validationMessage:
-                                          context.isAllBoundaryMandatory ||
-                                                  labelIndex == 0
-                                              ? localizations.translate(
-                                                  i18.common.corecommonRequired,
-                                                )
-                                              : null,
+                                          localizations.translate(
+                                        i18.common.corecommonRequired,
+                                      ),
                                       emptyText: localizations
                                           .translate(i18.common.noMatchFound),
                                     ),
@@ -470,10 +469,7 @@ class _BoundarySelectionPageState
                                               ? null
                                               : () async {
                                                   if (!form.valid ||
-                                                      validateAllBoundarySelection(
-                                                        context
-                                                            .isAllBoundaryMandatory,
-                                                      )) {
+                                                      validateAllBoundarySelection()) {
                                                     clickedStatus.value = false;
                                                     await DigitToast.show(
                                                       context,
@@ -501,8 +497,7 @@ class _BoundarySelectionPageState
 
                                                     if (context.mounted) {
                                                       if (isOnline &&
-                                                          context
-                                                              .isDownSyncEnabled) {
+                                                          isDistributor) {
                                                         context
                                                             .read<
                                                                 BeneficiaryDownSyncBloc>()
@@ -586,26 +581,22 @@ class _BoundarySelectionPageState
     return fb.group(formControls);
   }
 
-  bool validateAllBoundarySelection(bool mandateAllBoundarySelection) {
-    if (mandateAllBoundarySelection) {
-      // Iterate through the map entries
-      for (final entry in formControls.entries) {
-        // Access the form control
-        final formControl = entry.value;
+  bool validateAllBoundarySelection() {
+    // Iterate through the map entries
+    for (final entry in formControls.entries) {
+      // Access the form control
+      final formControl = entry.value;
 
-        // Check if the form control value is null
-        if (formControl.value == null) {
-          formControl.setErrors({'': true});
-          // Return true if any form control has a null value
+      // Check if the form control value is null
+      if (formControl.value == null) {
+        formControl.setErrors({'': true});
 
-          return true;
-        }
+        // Return true if any form control has a null value
+        return true;
       }
-
-      // Return false if none of the form controls have a null value
-      return false;
-    } else {
-      return false;
     }
+
+    // Return false if none of the form controls have a null value
+    return false;
   }
 }

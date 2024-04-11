@@ -1,29 +1,20 @@
 import 'dart:async';
 
-import 'package:attendance_management/pages/manage_attendance.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_components/widgets/digit_sync_dialog.dart';
-import 'package:drift/drift.dart' hide Column;
 import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:isar/isar.dart';
-import 'package:overlay_builder/overlay_builder.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../../data/local_store/no_sql/schema/app_configuration.dart'
-    as app_config;
-import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/auth/auth.dart';
-import '../blocs/hcm_attendance_bloc.dart';
 import '../blocs/search_households/search_households.dart';
+import '../blocs/search_referrals/search_referrals.dart';
 import '../blocs/sync/sync.dart';
 import '../data/data_repository.dart';
-import '../data/local_store/no_sql/schema/oplog.dart';
-
 import '../data/local_store/secure_store/secure_store.dart';
 import '../data/local_store/sql_store/sql_store.dart';
 import '../models/data_model.dart';
@@ -31,11 +22,12 @@ import '../router/app_router.dart';
 import '../utils/debound.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../utils/utils.dart';
-import '../widgets/action_card/action_card.dart';
 import '../widgets/header/back_navigation_help_header.dart';
 import '../widgets/home/home_item_card.dart';
 import '../widgets/localized.dart';
 import '../widgets/progress_bar/beneficiary_progress.dart';
+import '../widgets/showcase/config/showcase_constants.dart';
+import '../widgets/showcase/showcase_button.dart';
 
 class HomePage extends LocalizedStatefulWidget {
   const HomePage({
@@ -48,6 +40,8 @@ class HomePage extends LocalizedStatefulWidget {
 }
 
 class _HomePageState extends LocalizedState<HomePage> {
+  bool skipProgressBar = false;
+  final storage = const FlutterSecureStorage();
   late StreamSubscription<ConnectivityResult> subscription;
 
   @override
@@ -79,223 +73,192 @@ class _HomePageState extends LocalizedState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = context.read<AuthBloc>().state;
     final localSecureStore = LocalSecureStore.instance;
+    if (state is! AuthAuthenticatedState) {
+      return Container();
+    }
+    final roles = state.userModel.roles.map((e) {
+      return e.code;
+    });
 
-    List<GlobalKey<OverlayWidgetState>> overlayWidgetStateList = [];
-    List<GlobalKey<DigitWalkthroughState>> walkthroughWidgetStateList = [];
-    for (var i = 0; i < _getItems(context).length + 1; i++) {
-      overlayWidgetStateList
-          .add(GlobalKey<OverlayWidgetState>(debugLabel: 'home_Overlay_$i'));
-      walkthroughWidgetStateList.add(GlobalKey<DigitWalkthroughState>(
-        debugLabel: 'HOME_$i',
-      ));
+    if (!(roles.contains("DISTRIBUTOR") || roles.contains("REGISTRAR"))) {
+      skipProgressBar = true;
     }
 
-    GlobalKey<OverlayWidgetState> overlaykey = GlobalKey(debugLabel: 'new');
+    final mappedItems = _getItems(context);
 
-    GlobalKey<DigitWalkthroughWrapperState> overlayWrapperkey =
-        GlobalKey(debugLabel: 'newwrapper');
+    final homeItems = mappedItems?.homeItems ?? [];
+    final showcaseKeys = <GlobalKey>[
+      if (!skipProgressBar) homeShowcaseData.distributorProgressBar.showcaseKey,
+      ...(mappedItems?.showcaseKeys ?? []),
+    ];
 
     return Scaffold(
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: DigitWalkthroughWrapper(
-          key: overlayWrapperkey,
-          overlayWidget: overlaykey,
-          keysArray: overlayWidgetStateList,
-          widgetKey: walkthroughWidgetStateList,
-          initialIndex: 0,
-          child: IgnorePointer(
-            ignoring: overlayWrapperkey.currentState?.showOverlay ?? false,
-            child: ScrollableContent(
-              slivers: [
-                SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return DigitWalkthrough(
-                        onSkip: () =>
-                            {overlayWrapperkey.currentState?.onSelectedSkip()},
-                        widgetHeight: 130,
-                        onTap: () => {
-                          walkthroughWidgetStateList[index]
-                              .currentState
-                              ?.initOffsetsPositions(),
-                          overlayWrapperkey.currentState?.onSelectedTap(),
-                        },
-                        key: walkthroughWidgetStateList[index + 1],
-                        description:
-                            'help needs to be configured', // TODO implement showcase
-                        overlayWidget: overlayWidgetStateList[index + 1],
-                        titleAlignment: TextAlign.center,
-                        skipLabel:
-                            localizations.translate(i18.common.coreCommonSkip),
-                        nextLabel:
-                            localizations.translate(i18.common.coreCommonNext),
-                        child: _getItems(context).elementAt(index),
-                      );
-                    },
-                    childCount: _getItems(context).length,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 145,
-                    childAspectRatio: 104 / 128,
-                  ),
+      body: BlocListener<SyncBloc, SyncState>(
+        listener: (context, state) {
+          state.maybeWhen(
+            orElse: () {},
+            pendingSync: (count) {
+              final debouncer = Debouncer(seconds: 5);
+              debouncer.run(() async {
+                if (count != 0) {
+                  await localSecureStore.setManualSyncTrigger(false);
+                  if (context.mounted) {
+                    await performBackgroundService(
+                      isBackground: false,
+                      stopService: false,
+                      context: context,
+                    );
+                  }
+                } else {
+                  await localSecureStore.setManualSyncTrigger(true);
+                }
+              });
+            },
+          );
+        },
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: ScrollableContent(
+            slivers: [
+              SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return homeItems.elementAt(index);
+                  },
+                  childCount: homeItems.length,
                 ),
-              ],
-              header: Column(children: [
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 145,
+                  childAspectRatio: 104 / 128,
+                ),
+              ),
+            ],
+            header: Column(
+              children: [
                 BackNavigationHelpHeaderWidget(
                   showBackNavigation: false,
-                  helpClicked: () {
-                    for (var i = 0; i < _getItems(context).length; i++) {
-                      walkthroughWidgetStateList[i]
-                          .currentState
-                          ?.initOffsetsPositions();
-                    }
-                    overlayWrapperkey.currentState?.onSelectedTap();
-                  },
-                ),
-                if (context.showProgressBar)
-                  DigitWalkthrough(
-                    onSkip: () =>
-                        {overlayWrapperkey.currentState?.onSelectedSkip()},
-                    widgetHeight: 150,
-                    onTap: () {
-                      overlayWrapperkey.currentState?.onSelectedTap();
-                    },
-                    key: walkthroughWidgetStateList[0],
-                    description:
-                        localizations.translate(i18.home.progressIndicatorHelp),
-                    overlayWidget: overlayWidgetStateList[0],
-                    titleAlignment: TextAlign.center,
-                    skipLabel:
-                        localizations.translate(i18.common.coreCommonSkip),
-                    nextLabel:
-                        localizations.translate(i18.common.coreCommonNext),
-                    child: BeneficiaryProgressBar(
-                      label: localizations.translate(
-                        i18.home.progressIndicatorTitle,
-                      ),
-                      prefixLabel: localizations.translate(
-                        i18.home.progressIndicatorPrefixLabel,
-                      ),
-                    ),
+                  showHelp: false,
+                  showcaseButton: ShowcaseButton(
+                    showcaseFor: showcaseKeys.toSet().toList(),
                   ),
-              ]),
-              footer: PoweredByDigit(
-                version: Constants().version,
-              ),
-              children: [
-                const SizedBox(height: kPadding * 2),
-                BlocConsumer<SyncBloc, SyncState>(
-                  listener: (context, state) {
-                    state.maybeWhen(
-                      orElse: () => null,
-                      syncInProgress: () async {
-                        await localSecureStore.setManualSyncTrigger(true);
-                        if (context.mounted) {
-                          DigitSyncDialog.show(
-                            context,
-                            type: DigitSyncDialogType.inProgress,
-                            label: localizations.translate(
-                              i18.syncDialog.syncInProgressTitle,
-                            ),
-                            barrierDismissible: false,
-                          );
-                        }
-                      },
-                      completedSync: () async {
-                        Navigator.of(context, rootNavigator: true).pop();
-                        await localSecureStore.setManualSyncTrigger(false);
-                        if (context.mounted) {
-                          DigitSyncDialog.show(
-                            context,
-                            type: DigitSyncDialogType.complete,
-                            label: localizations.translate(
-                              i18.syncDialog.dataSyncedTitle,
-                            ),
-                            primaryAction: DigitDialogActions(
-                              label: localizations.translate(
-                                i18.syncDialog.closeButtonLabel,
-                              ),
-                              action: (ctx) {
-                                Navigator.pop(ctx);
-                              },
-                            ),
-                          );
-                        }
-                      },
-                      failedSync: () async {
-                        await localSecureStore.setManualSyncTrigger(false);
-                        if (context.mounted) {
-                          _showSyncFailedDialog(
-                            context,
-                            message: localizations.translate(
-                              i18.syncDialog.syncFailedTitle,
-                            ),
-                          );
-                        }
-                      },
-                      failedDownSync: () async {
-                        await localSecureStore.setManualSyncTrigger(false);
-                        if (context.mounted) {
-                          _showSyncFailedDialog(
-                            context,
-                            message: localizations.translate(
-                              i18.syncDialog.downSyncFailedTitle,
-                            ),
-                          );
-                        }
-                      },
-                      failedUpSync: () async {
-                        await localSecureStore.setManualSyncTrigger(false);
-                        if (context.mounted) {
-                          _showSyncFailedDialog(
-                            context,
-                            message: localizations.translate(
-                              i18.syncDialog.upSyncFailedTitle,
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  },
-                  builder: (context, state) {
-                    return state.maybeWhen(
-                      orElse: () => const Offstage(),
-                      pendingSync: (count) {
-                        final debouncer = Debouncer(seconds: 5);
-
-                        debouncer.run(() async {
-                          if (count != 0) {
-                            if (context.mounted) {
-                              performBackgroundService(
-                                isBackground: false,
-                                stopService: false,
-                                context: context,
-                              );
-                            }
-                          }
-                        });
-
-                        return count == 0
-                            ? const Offstage()
-                            : DigitInfoCard(
-                                icon: Icons.info,
-                                backgroundColor:
-                                    theme.colorScheme.tertiaryContainer,
-                                iconColor: theme.colorScheme.surfaceTint,
-                                description: localizations
-                                    .translate(i18.home.dataSyncInfoContent)
-                                    .replaceAll('{}', count.toString()),
-                                title: localizations
-                                    .translate(i18.home.dataSyncInfoLabel),
-                              );
-                      },
-                    );
-                  },
                 ),
+                skipProgressBar
+                    ? const SizedBox.shrink()
+                    : homeShowcaseData.distributorProgressBar.buildWith(
+                        child: BeneficiaryProgressBar(
+                          label: localizations.translate(
+                            i18.home.progressIndicatorTitle,
+                          ),
+                          prefixLabel: localizations.translate(
+                            i18.home.progressIndicatorPrefixLabel,
+                          ),
+                        ),
+                      ),
               ],
             ),
+            footer: PoweredByDigit(
+              version: Constants().version,
+            ),
+            children: [
+              const SizedBox(height: kPadding * 2),
+              BlocConsumer<SyncBloc, SyncState>(
+                listener: (context, state) {
+                  state.maybeWhen(
+                    orElse: () => null,
+                    syncInProgress: () async {
+                      await localSecureStore.setManualSyncTrigger(false);
+                      if (context.mounted) {
+                        DigitSyncDialog.show(
+                          context,
+                          type: DigitSyncDialogType.inProgress,
+                          label: localizations.translate(
+                            i18.syncDialog.syncInProgressTitle,
+                          ),
+                          barrierDismissible: false,
+                        );
+                      }
+                    },
+                    completedSync: () async {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      await localSecureStore.setManualSyncTrigger(true);
+                      if (context.mounted) {
+                        DigitSyncDialog.show(
+                          context,
+                          type: DigitSyncDialogType.complete,
+                          label: localizations.translate(
+                            i18.syncDialog.dataSyncedTitle,
+                          ),
+                          primaryAction: DigitDialogActions(
+                            label: localizations.translate(
+                              i18.syncDialog.closeButtonLabel,
+                            ),
+                            action: (ctx) {
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                        );
+                      }
+                    },
+                    failedSync: () async {
+                      await localSecureStore.setManualSyncTrigger(true);
+                      if (context.mounted) {
+                        _showSyncFailedDialog(
+                          context,
+                          message: localizations.translate(
+                            i18.syncDialog.syncFailedTitle,
+                          ),
+                        );
+                      }
+                    },
+                    failedDownSync: () async {
+                      await localSecureStore.setManualSyncTrigger(true);
+                      if (context.mounted) {
+                        _showSyncFailedDialog(
+                          context,
+                          message: localizations.translate(
+                            i18.syncDialog.downSyncFailedTitle,
+                          ),
+                        );
+                      }
+                    },
+                    failedUpSync: () async {
+                      await localSecureStore.setManualSyncTrigger(true);
+                      if (context.mounted) {
+                        _showSyncFailedDialog(
+                          context,
+                          message: localizations.translate(
+                            i18.syncDialog.upSyncFailedTitle,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                },
+                builder: (context, state) {
+                  return state.maybeWhen(
+                    orElse: () => const Offstage(),
+                    pendingSync: (count) {
+                      return count == 0
+                          ? const Offstage()
+                          : DigitInfoCard(
+                              icon: Icons.info,
+                              backgroundColor:
+                                  theme.colorScheme.tertiaryContainer,
+                              iconColor: theme.colorScheme.surfaceTint,
+                              description: localizations
+                                  .translate(i18.home.dataSyncInfoContent)
+                                  .replaceAll('{}', count.toString()),
+                              title: localizations.translate(
+                                i18.home.dataSyncInfoLabel,
+                              ),
+                            );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -318,6 +281,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
         action: (ctx) {
           Navigator.pop(ctx);
+          // Sync Failed Manual Sync is Enabled
           _attemptSyncUp(context);
         },
       ),
@@ -330,226 +294,253 @@ class _HomePageState extends LocalizedState<HomePage> {
     );
   }
 
-  List<Widget> _getItems(BuildContext context) {
+  _HomeItemDataModel? _getItems(BuildContext context) {
     final state = context.read<AuthBloc>().state;
     if (state is! AuthAuthenticatedState) {
-      return [];
+      return null;
     }
 
     final Map<String, Widget> homeItemsMap = {
-      i18.home.beneficiaryLabel: HomeItemCard(
-        icon: Icons.all_inbox,
-        label: i18.home.beneficiaryLabel,
-        onPressed: () async {
-          final searchBloc = context.read<SearchHouseholdsBloc>();
-          await context.router.push(
-            SearchBeneficiaryRoute(),
-          );
-          searchBloc.add(const SearchHouseholdsClearEvent());
-        },
+      i18.home.beneficiaryLabel:
+          homeShowcaseData.distributorBeneficiaries.buildWith(
+        child: HomeItemCard(
+          icon: Icons.all_inbox,
+          label: i18.home.beneficiaryLabel,
+          onPressed: () async {
+            final searchBloc = context.read<SearchHouseholdsBloc>();
+            await context.router.push(
+              SearchBeneficiaryRoute(),
+            );
+            searchBloc.add(const SearchHouseholdsClearEvent());
+          },
+        ),
       ),
-      i18.home.manageStockLabel: HomeItemCard(
-        icon: Icons.store_mall_directory,
-        label: i18.home.manageStockLabel,
-        onPressed: () => context.router.push(ManageStocksRoute()),
-      ),
-      i18.home.stockReconciliationLabel: HomeItemCard(
-        icon: Icons.menu_book,
-        label: i18.home.stockReconciliationLabel,
-        onPressed: () => context.router.push(StockReconciliationRoute()),
-      ),
-      i18.home.warehouseManagerCheckList: HomeItemCard(
-        icon: Icons.menu_book,
-        label: i18.home.warehouseManagerCheckList,
-        onPressed: () => context.router.push(ChecklistWrapperRoute()),
-      ),
-      i18.home.healthFacilitySupervisorCheckList: HomeItemCard(
-        icon: Icons.menu_book,
-        label: i18.home.healthFacilitySupervisorCheckList,
-        onPressed: () => context.router.push(ChecklistWrapperRoute()),
-      ),
-      i18.home.myCheckList: HomeItemCard(
-        icon: Icons.menu_book,
-        label: i18.home.myCheckList,
-        onPressed: () => context.router.push(ChecklistWrapperRoute()),
-      ),
-      i18.home.fileComplaint: HomeItemCard(
-        icon: Icons.announcement,
-        label: i18.home.fileComplaint,
-        onPressed: () =>
-            context.router.push(const ComplaintsInboxWrapperRoute()),
-      ),
-      i18.home.syncDataLabel: StreamBuilder<Map<String, dynamic>?>(
-        stream: FlutterBackgroundService().on('serviceRunning'),
-        builder: (context, snapshot) {
-          return HomeItemCard(
-            icon: Icons.sync_alt,
-            label: i18.home.syncDataLabel,
-            onPressed: () async {
-              if (snapshot.data?['enablesManualSync'] == true) {
-                if (context.mounted) _attemptSyncUp(context);
-              } else {
-                if (context.mounted) {
-                  DigitToast.show(
-                    context,
-                    options: DigitToastOptions(
-                      localizations
-                          .translate(i18.common.coreCommonSyncInProgress),
-                      false,
-                      Theme.of(context),
-                    ),
-                  );
-                }
-              }
-            },
-          );
-        },
-      ),
-      i18.home.viewReportsLabel: HomeItemCard(
-        icon: Icons.announcement,
-        label: i18.home.viewReportsLabel,
-        onPressed: () {
-          context.router.push(
-            InventoryReportSelectionRoute(),
-          );
-        },
-      ),
-      'DB': HomeItemCard(
-        icon: Icons.table_chart,
-        label: 'DB',
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => DriftDbViewer(
-                context.read<LocalSqlDataStore>(),
-              ),
-            ),
-          );
-        },
-      ),      
-      i18.home.manageAttendanceLabel:HomeItemCard(
-          icon: Icons.fingerprint_outlined,
-          label: i18.home.manageAttendanceLabel,
+      i18.home.manageStockLabel:
+          homeShowcaseData.warehouseManagerManageStock.buildWith(
+        child: HomeItemCard(
+          icon: Icons.store_mall_directory,
+          label: i18.home.manageStockLabel,
           onPressed: () {
-            Navigator.push(
-              context,
+            context.router.push(ManageStocksRoute());
+          },
+        ),
+      ),
+      i18.home.stockReconciliationLabel:
+          homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
+        child: HomeItemCard(
+          icon: Icons.menu_book,
+          label: i18.home.stockReconciliationLabel,
+          onPressed: () {
+            context.router.push(StockReconciliationRoute());
+          },
+        ),
+      ),
+      i18.home.myCheckList: homeShowcaseData.supervisorMyChecklist.buildWith(
+        child: HomeItemCard(
+          enableCustomIcon: true,
+          customIcon: myChecklistSvg,
+          icon: Icons.checklist,
+          label: i18.home.myCheckList,
+          onPressed: () => context.router.push(ChecklistWrapperRoute()),
+        ),
+      ),
+      i18.home.fileComplaint:
+          homeShowcaseData.distributorFileComplaint.buildWith(
+        child: HomeItemCard(
+          icon: Icons.announcement,
+          label: i18.home.fileComplaint,
+          onPressed: () =>
+              context.router.push(const ComplaintsInboxWrapperRoute()),
+        ),
+      ),
+      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.buildWith(
+        child: StreamBuilder<Map<String, dynamic>?>(
+          stream: FlutterBackgroundService().on('serviceRunning'),
+          builder: (context, snapshot) {
+            return HomeItemCard(
+              icon: Icons.sync_alt,
+              label: i18.home.syncDataLabel,
+              onPressed: () async {
+                if (snapshot.data?['enablesManualSync'] == true) {
+                  if (context.mounted) _attemptSyncUp(context);
+                } else {
+                  if (context.mounted) {
+                    DigitToast.show(
+                      context,
+                      options: DigitToastOptions(
+                        localizations
+                            .translate(i18.common.coreCommonSyncInProgress),
+                        false,
+                        Theme.of(context),
+                      ),
+                    );
+                  }
+                }
+              },
+            );
+          },
+        ),
+      ),
+      i18.home.beneficiaryReferralLabel:
+          homeShowcaseData.beneficiaryReferral.buildWith(
+        child: HomeItemCard(
+          icon: Icons.supervised_user_circle_rounded,
+          label: i18.home.beneficiaryReferralLabel,
+          onPressed: () async {
+            final searchBloc = context.read<SearchReferralsBloc>();
+            searchBloc.add(const SearchReferralsClearEvent());
+            await context.router.push(SearchReferralsRoute());
+          },
+        ),
+      ),
+      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.buildWith(
+        child: HomeItemCard(
+          icon: Icons.announcement,
+          label: i18.home.viewReportsLabel,
+          onPressed: () {
+            context.router.push(
+              InventoryReportSelectionRoute(),
+            );
+          },
+        ),
+      ),
+      i18.home.db: homeShowcaseData.db.buildWith(
+        child: HomeItemCard(
+          icon: Icons.table_chart,
+          label: i18.home.db,
+          onPressed: () {
+            Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => ManageAttendancePage(
-                  attendanceListeners: HCMAttendanceBloc(
-                    userId: context.loggedInUserUuid,
-                    projectId: context.projectId,
-                    attendanceLocalRepository: context.read<
-                        LocalRepository<HCMAttendanceRegisterModel,
-                            HCMAttendanceSearchModel>>(),
-                    individualLocalRepository: context.read<
-                        LocalRepository<IndividualModel,
-                            IndividualSearchModel>>(),
-                    attendanceLogLocalRepository: context.read<
-                        LocalRepository<HCMAttendanceLogModel,
-                            HCMAttendanceLogSearchModel>>(),
-                    context: context,
-                    individualId: context.loggedInIndividualId,
-                  ),
-                  projectId: context.projectId,
-                  userId: context.loggedInUserUuid,
-                  appVersion: Constants().version,
-                  boundaryName : context.boundary.name!,
+                builder: (context) => DriftDbViewer(
+                  context.read<LocalSqlDataStore>(),
                 ),
-                settings: const RouteSettings(name: '/manage-attendance'),
               ),
             );
           },
         ),
+      ),
+    };
+
+    final Map<String, GlobalKey> homeItemsShowcaseMap = {
+      i18.home.beneficiaryLabel:
+          homeShowcaseData.distributorBeneficiaries.showcaseKey,
+      i18.home.manageStockLabel:
+          homeShowcaseData.warehouseManagerManageStock.showcaseKey,
+      i18.home.stockReconciliationLabel:
+          homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
+      i18.home.myCheckList: homeShowcaseData.supervisorMyChecklist.showcaseKey,
+      i18.home.fileComplaint:
+          homeShowcaseData.distributorFileComplaint.showcaseKey,
+      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.showcaseKey,
+      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.showcaseKey,
+      i18.home.db: homeShowcaseData.inventoryReport.showcaseKey,
+      i18.home.beneficiaryReferralLabel:
+          homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
     };
 
     final homeItemsLabel = <String>[
       i18.home.beneficiaryLabel,
       i18.home.manageStockLabel,
       i18.home.stockReconciliationLabel,
-      i18.home.healthFacilitySupervisorCheckList,
-      i18.home.warehouseManagerCheckList,
       i18.home.myCheckList,
       i18.home.fileComplaint,
       i18.home.syncDataLabel,
       i18.home.viewReportsLabel,
-      // attendance
-      i18.home.manageAttendanceLabel,
-      'DB',
+      i18.home.db,
+      i18.home.beneficiaryReferralLabel,
     ];
 
     final List<String> filteredLabels = homeItemsLabel
-        .where((element) => state.actionsWrapper.actions
-            .map((e) => e.displayName)
-            .toList()
-            .contains(element))
+        .where((element) =>
+            state.actionsWrapper.actions
+                .map((e) => e.displayName)
+                .toList()
+                .contains(element) ||
+            element == i18.home.db)
         .toList();
+
+    final showcaseKeys =
+        filteredLabels.map((label) => homeItemsShowcaseMap[label]!).toList();
 
     final List<Widget> widgetList =
         filteredLabels.map((label) => homeItemsMap[label]!).toList();
 
-    return widgetList;
+    return _HomeItemDataModel(
+      widgetList,
+      showcaseKeys,
+    );
   }
 
-  void _attemptSyncUp(BuildContext context) {
-    context.read<SyncBloc>().add(
-          SyncSyncUpEvent(
-            userId: context.loggedInUserUuid,
-            localRepositories: [
-              context.read<
-                  LocalRepository<HouseholdModel, HouseholdSearchModel>>(),
-              context.read<
-                  LocalRepository<IndividualModel, IndividualSearchModel>>(),
-              context.read<
-                  LocalRepository<ProjectBeneficiaryModel,
-                      ProjectBeneficiarySearchModel>>(),
-              context.read<
-                  LocalRepository<HouseholdMemberModel,
-                      HouseholdMemberSearchModel>>(),
-              context.read<LocalRepository<TaskModel, TaskSearchModel>>(),
-              context
-                  .read<LocalRepository<ReferralModel, ReferralSearchModel>>(),
-              context.read<
-                  LocalRepository<SideEffectModel, SideEffectSearchModel>>(),
-              context.read<LocalRepository<StockModel, StockSearchModel>>(),
-              context.read<LocalRepository<ServiceModel, ServiceSearchModel>>(),
-              context.read<
-                  LocalRepository<StockReconciliationModel,
-                      StockReconciliationSearchModel>>(),
-              context.read<
-                  LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(),
-              context.read<
-                    LocalRepository<HCMAttendanceLogModel,
-                        HCMAttendanceLogSearchModel>>(),
-            ],
-            remoteRepositories: [
-              context.read<
-                  RemoteRepository<HouseholdModel, HouseholdSearchModel>>(),
-              context.read<
-                  RemoteRepository<IndividualModel, IndividualSearchModel>>(),
-              context.read<
-                  RemoteRepository<ProjectBeneficiaryModel,
-                      ProjectBeneficiarySearchModel>>(),
-              context.read<
-                  RemoteRepository<HouseholdMemberModel,
-                      HouseholdMemberSearchModel>>(),
-              context.read<RemoteRepository<TaskModel, TaskSearchModel>>(),
-              context
-                  .read<RemoteRepository<ReferralModel, ReferralSearchModel>>(),
-              context.read<
-                  RemoteRepository<SideEffectModel, SideEffectSearchModel>>(),
-              context.read<RemoteRepository<StockModel, StockSearchModel>>(),
-              context
-                  .read<RemoteRepository<ServiceModel, ServiceSearchModel>>(),
-              context.read<
-                  RemoteRepository<StockReconciliationModel,
-                      StockReconciliationSearchModel>>(),
-              context.read<
-                  RemoteRepository<PgrServiceModel, PgrServiceSearchModel>>(),
-              context.read<
-                  RemoteRepository<HCMAttendanceLogModel,
-                      HCMAttendanceLogSearchModel>>(),
-            ],
-          ),
-        );
+  void _attemptSyncUp(BuildContext context) async {
+    await LocalSecureStore.instance.setManualSyncTrigger(true);
+
+    if (context.mounted) {
+      context.read<SyncBloc>().add(
+            SyncSyncUpEvent(
+              userId: context.loggedInUserUuid,
+              localRepositories: [
+                context.read<
+                    LocalRepository<HouseholdModel, HouseholdSearchModel>>(),
+                context.read<
+                    LocalRepository<IndividualModel, IndividualSearchModel>>(),
+                context.read<
+                    LocalRepository<ProjectBeneficiaryModel,
+                        ProjectBeneficiarySearchModel>>(),
+                context.read<
+                    LocalRepository<HouseholdMemberModel,
+                        HouseholdMemberSearchModel>>(),
+                context.read<LocalRepository<TaskModel, TaskSearchModel>>(),
+                context.read<
+                    LocalRepository<SideEffectModel, SideEffectSearchModel>>(),
+                context.read<
+                    LocalRepository<ReferralModel, ReferralSearchModel>>(),
+                context.read<LocalRepository<StockModel, StockSearchModel>>(),
+                context
+                    .read<LocalRepository<ServiceModel, ServiceSearchModel>>(),
+                context.read<
+                    LocalRepository<StockReconciliationModel,
+                        StockReconciliationSearchModel>>(),
+                context.read<
+                    LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(),
+                context.read<
+                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
+              ],
+              remoteRepositories: [
+                context.read<
+                    RemoteRepository<HouseholdModel, HouseholdSearchModel>>(),
+                context.read<
+                    RemoteRepository<IndividualModel, IndividualSearchModel>>(),
+                context.read<
+                    RemoteRepository<ProjectBeneficiaryModel,
+                        ProjectBeneficiarySearchModel>>(),
+                context.read<
+                    RemoteRepository<HouseholdMemberModel,
+                        HouseholdMemberSearchModel>>(),
+                context.read<RemoteRepository<TaskModel, TaskSearchModel>>(),
+                context.read<
+                    RemoteRepository<SideEffectModel, SideEffectSearchModel>>(),
+                context.read<
+                    RemoteRepository<ReferralModel, ReferralSearchModel>>(),
+                context.read<RemoteRepository<StockModel, StockSearchModel>>(),
+                context
+                    .read<RemoteRepository<ServiceModel, ServiceSearchModel>>(),
+                context.read<
+                    RemoteRepository<StockReconciliationModel,
+                        StockReconciliationSearchModel>>(),
+                context.read<
+                    RemoteRepository<PgrServiceModel, PgrServiceSearchModel>>(),
+                context.read<
+                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
+              ],
+            ),
+          );
+    }
   }
+}
+
+class _HomeItemDataModel {
+  final List<Widget> homeItems;
+  final List<GlobalKey> showcaseKeys;
+
+  const _HomeItemDataModel(this.homeItems, this.showcaseKeys);
 }

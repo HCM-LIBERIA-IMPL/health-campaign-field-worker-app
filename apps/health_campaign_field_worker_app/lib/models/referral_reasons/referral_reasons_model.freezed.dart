@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'referral_reasons_model.dart';
 
@@ -12,7 +12,7 @@ part of 'referral_reasons_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 ReferralReasonsWrapperModel _$ReferralReasonsWrapperModelFromJson(
     Map<String, dynamic> json) {
@@ -41,7 +41,7 @@ abstract class $ReferralReasonsWrapperModelCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'referralReasons')
-      List<ReferralReasonType>? referralReasonList});
+          List<ReferralReasonType>? referralReasonList});
 }
 
 /// @nodoc
@@ -70,27 +70,27 @@ class _$ReferralReasonsWrapperModelCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$ReferralReasonsWrapperModelImplCopyWith<$Res>
+abstract class _$$_ReferralReasonsWrapperModelCopyWith<$Res>
     implements $ReferralReasonsWrapperModelCopyWith<$Res> {
-  factory _$$ReferralReasonsWrapperModelImplCopyWith(
-          _$ReferralReasonsWrapperModelImpl value,
-          $Res Function(_$ReferralReasonsWrapperModelImpl) then) =
-      __$$ReferralReasonsWrapperModelImplCopyWithImpl<$Res>;
+  factory _$$_ReferralReasonsWrapperModelCopyWith(
+          _$_ReferralReasonsWrapperModel value,
+          $Res Function(_$_ReferralReasonsWrapperModel) then) =
+      __$$_ReferralReasonsWrapperModelCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
       {@JsonKey(name: 'referralReasons')
-      List<ReferralReasonType>? referralReasonList});
+          List<ReferralReasonType>? referralReasonList});
 }
 
 /// @nodoc
-class __$$ReferralReasonsWrapperModelImplCopyWithImpl<$Res>
+class __$$_ReferralReasonsWrapperModelCopyWithImpl<$Res>
     extends _$ReferralReasonsWrapperModelCopyWithImpl<$Res,
-        _$ReferralReasonsWrapperModelImpl>
-    implements _$$ReferralReasonsWrapperModelImplCopyWith<$Res> {
-  __$$ReferralReasonsWrapperModelImplCopyWithImpl(
-      _$ReferralReasonsWrapperModelImpl _value,
-      $Res Function(_$ReferralReasonsWrapperModelImpl) _then)
+        _$_ReferralReasonsWrapperModel>
+    implements _$$_ReferralReasonsWrapperModelCopyWith<$Res> {
+  __$$_ReferralReasonsWrapperModelCopyWithImpl(
+      _$_ReferralReasonsWrapperModel _value,
+      $Res Function(_$_ReferralReasonsWrapperModel) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -98,7 +98,7 @@ class __$$ReferralReasonsWrapperModelImplCopyWithImpl<$Res>
   $Res call({
     Object? referralReasonList = freezed,
   }) {
-    return _then(_$ReferralReasonsWrapperModelImpl(
+    return _then(_$_ReferralReasonsWrapperModel(
       referralReasonList: freezed == referralReasonList
           ? _value._referralReasonList
           : referralReasonList // ignore: cast_nullable_to_non_nullable
@@ -109,16 +109,14 @@ class __$$ReferralReasonsWrapperModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ReferralReasonsWrapperModelImpl
-    implements _ReferralReasonsWrapperModel {
-  const _$ReferralReasonsWrapperModelImpl(
+class _$_ReferralReasonsWrapperModel implements _ReferralReasonsWrapperModel {
+  const _$_ReferralReasonsWrapperModel(
       {@JsonKey(name: 'referralReasons')
-      final List<ReferralReasonType>? referralReasonList})
+          final List<ReferralReasonType>? referralReasonList})
       : _referralReasonList = referralReasonList;
 
-  factory _$ReferralReasonsWrapperModelImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$ReferralReasonsWrapperModelImplFromJson(json);
+  factory _$_ReferralReasonsWrapperModel.fromJson(Map<String, dynamic> json) =>
+      _$$_ReferralReasonsWrapperModelFromJson(json);
 
   final List<ReferralReasonType>? _referralReasonList;
   @override
@@ -126,8 +124,6 @@ class _$ReferralReasonsWrapperModelImpl
   List<ReferralReasonType>? get referralReasonList {
     final value = _referralReasonList;
     if (value == null) return null;
-    if (_referralReasonList is EqualUnmodifiableListView)
-      return _referralReasonList;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -138,10 +134,10 @@ class _$ReferralReasonsWrapperModelImpl
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralReasonsWrapperModelImpl &&
+            other is _$_ReferralReasonsWrapperModel &&
             const DeepCollectionEquality()
                 .equals(other._referralReasonList, _referralReasonList));
   }
@@ -154,13 +150,13 @@ class _$ReferralReasonsWrapperModelImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralReasonsWrapperModelImplCopyWith<_$ReferralReasonsWrapperModelImpl>
-      get copyWith => __$$ReferralReasonsWrapperModelImplCopyWithImpl<
-          _$ReferralReasonsWrapperModelImpl>(this, _$identity);
+  _$$_ReferralReasonsWrapperModelCopyWith<_$_ReferralReasonsWrapperModel>
+      get copyWith => __$$_ReferralReasonsWrapperModelCopyWithImpl<
+          _$_ReferralReasonsWrapperModel>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ReferralReasonsWrapperModelImplToJson(
+    return _$$_ReferralReasonsWrapperModelToJson(
       this,
     );
   }
@@ -170,18 +166,18 @@ abstract class _ReferralReasonsWrapperModel
     implements ReferralReasonsWrapperModel {
   const factory _ReferralReasonsWrapperModel(
           {@JsonKey(name: 'referralReasons')
-          final List<ReferralReasonType>? referralReasonList}) =
-      _$ReferralReasonsWrapperModelImpl;
+              final List<ReferralReasonType>? referralReasonList}) =
+      _$_ReferralReasonsWrapperModel;
 
   factory _ReferralReasonsWrapperModel.fromJson(Map<String, dynamic> json) =
-      _$ReferralReasonsWrapperModelImpl.fromJson;
+      _$_ReferralReasonsWrapperModel.fromJson;
 
   @override
   @JsonKey(name: 'referralReasons')
   List<ReferralReasonType>? get referralReasonList;
   @override
   @JsonKey(ignore: true)
-  _$$ReferralReasonsWrapperModelImplCopyWith<_$ReferralReasonsWrapperModelImpl>
+  _$$_ReferralReasonsWrapperModelCopyWith<_$_ReferralReasonsWrapperModel>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -245,22 +241,22 @@ class _$ReferralReasonTypeCopyWithImpl<$Res, $Val extends ReferralReasonType>
 }
 
 /// @nodoc
-abstract class _$$ReferralReasonTypeImplCopyWith<$Res>
+abstract class _$$_ReferralReasonTypeCopyWith<$Res>
     implements $ReferralReasonTypeCopyWith<$Res> {
-  factory _$$ReferralReasonTypeImplCopyWith(_$ReferralReasonTypeImpl value,
-          $Res Function(_$ReferralReasonTypeImpl) then) =
-      __$$ReferralReasonTypeImplCopyWithImpl<$Res>;
+  factory _$$_ReferralReasonTypeCopyWith(_$_ReferralReasonType value,
+          $Res Function(_$_ReferralReasonType) then) =
+      __$$_ReferralReasonTypeCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String code, String name, bool active});
 }
 
 /// @nodoc
-class __$$ReferralReasonTypeImplCopyWithImpl<$Res>
-    extends _$ReferralReasonTypeCopyWithImpl<$Res, _$ReferralReasonTypeImpl>
-    implements _$$ReferralReasonTypeImplCopyWith<$Res> {
-  __$$ReferralReasonTypeImplCopyWithImpl(_$ReferralReasonTypeImpl _value,
-      $Res Function(_$ReferralReasonTypeImpl) _then)
+class __$$_ReferralReasonTypeCopyWithImpl<$Res>
+    extends _$ReferralReasonTypeCopyWithImpl<$Res, _$_ReferralReasonType>
+    implements _$$_ReferralReasonTypeCopyWith<$Res> {
+  __$$_ReferralReasonTypeCopyWithImpl(
+      _$_ReferralReasonType _value, $Res Function(_$_ReferralReasonType) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -270,7 +266,7 @@ class __$$ReferralReasonTypeImplCopyWithImpl<$Res>
     Object? name = null,
     Object? active = null,
   }) {
-    return _then(_$ReferralReasonTypeImpl(
+    return _then(_$_ReferralReasonType(
       code: null == code
           ? _value.code
           : code // ignore: cast_nullable_to_non_nullable
@@ -289,12 +285,12 @@ class __$$ReferralReasonTypeImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ReferralReasonTypeImpl implements _ReferralReasonType {
-  const _$ReferralReasonTypeImpl(
+class _$_ReferralReasonType implements _ReferralReasonType {
+  const _$_ReferralReasonType(
       {required this.code, required this.name, required this.active});
 
-  factory _$ReferralReasonTypeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReferralReasonTypeImplFromJson(json);
+  factory _$_ReferralReasonType.fromJson(Map<String, dynamic> json) =>
+      _$$_ReferralReasonTypeFromJson(json);
 
   @override
   final String code;
@@ -309,10 +305,10 @@ class _$ReferralReasonTypeImpl implements _ReferralReasonType {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralReasonTypeImpl &&
+            other is _$_ReferralReasonType &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.active, active) || other.active == active));
@@ -325,13 +321,13 @@ class _$ReferralReasonTypeImpl implements _ReferralReasonType {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralReasonTypeImplCopyWith<_$ReferralReasonTypeImpl> get copyWith =>
-      __$$ReferralReasonTypeImplCopyWithImpl<_$ReferralReasonTypeImpl>(
+  _$$_ReferralReasonTypeCopyWith<_$_ReferralReasonType> get copyWith =>
+      __$$_ReferralReasonTypeCopyWithImpl<_$_ReferralReasonType>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ReferralReasonTypeImplToJson(
+    return _$$_ReferralReasonTypeToJson(
       this,
     );
   }
@@ -341,10 +337,10 @@ abstract class _ReferralReasonType implements ReferralReasonType {
   const factory _ReferralReasonType(
       {required final String code,
       required final String name,
-      required final bool active}) = _$ReferralReasonTypeImpl;
+      required final bool active}) = _$_ReferralReasonType;
 
   factory _ReferralReasonType.fromJson(Map<String, dynamic> json) =
-      _$ReferralReasonTypeImpl.fromJson;
+      _$_ReferralReasonType.fromJson;
 
   @override
   String get code;
@@ -354,6 +350,6 @@ abstract class _ReferralReasonType implements ReferralReasonType {
   bool get active;
   @override
   @JsonKey(ignore: true)
-  _$$ReferralReasonTypeImplCopyWith<_$ReferralReasonTypeImpl> get copyWith =>
+  _$$_ReferralReasonTypeCopyWith<_$_ReferralReasonType> get copyWith =>
       throw _privateConstructorUsedError;
 }

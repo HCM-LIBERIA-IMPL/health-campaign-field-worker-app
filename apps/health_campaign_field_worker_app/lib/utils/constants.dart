@@ -1,7 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:digit_components/utils/app_logger.dart';
-import 'package:digit_firebase_services/digit_firebase_services.dart'
-    as firebase_services;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -16,10 +13,9 @@ import '../data/local_store/no_sql/schema/project_types.dart';
 import '../data/local_store/no_sql/schema/row_versions.dart';
 import '../data/local_store/no_sql/schema/service_registry.dart';
 import '../data/local_store/sql_store/sql_store.dart';
-import '../data/repositories/local/attendance_logs.dart';
 import '../data/repositories/local/boundary.dart';
 import '../data/repositories/local/facility.dart';
-import '../data/repositories/local/hcm_attendance.dart';
+import '../data/repositories/local/h_f_referral.dart';
 import '../data/repositories/local/household.dart';
 import '../data/repositories/local/houshold_member.dart';
 import '../data/repositories/local/individual.dart';
@@ -38,10 +34,10 @@ import '../data/repositories/local/stock.dart';
 import '../data/repositories/local/stock_reconciliation.dart';
 import '../data/repositories/local/task.dart';
 import '../data/repositories/oplog/oplog.dart';
-import '../data/repositories/remote/attendance_logs.dart';
 import '../data/repositories/remote/boundary.dart';
+import '../data/repositories/remote/downsync.dart';
 import '../data/repositories/remote/facility.dart';
-import '../data/repositories/remote/hcm_attendance.dart';
+import '../data/repositories/remote/h_f_referral.dart';
 import '../data/repositories/remote/household.dart';
 import '../data/repositories/remote/household_member.dart';
 import '../data/repositories/remote/individual.dart';
@@ -60,9 +56,7 @@ import '../data/repositories/remote/side_effect.dart';
 import '../data/repositories/remote/stock.dart';
 import '../data/repositories/remote/stock_reconciliation.dart';
 import '../data/repositories/remote/task.dart';
-import '../firebase_options.dart';
 import '../models/data_model.dart';
-import '../models/data_model.init.dart';
 
 class Constants {
   late Future<Isar> _isar;
@@ -75,7 +69,6 @@ class Constants {
     return _instance;
   }
   Future initialize(version) async {
-    initializeMappers();
     await _initializeIsar(version);
   }
 
@@ -100,6 +93,7 @@ class Constants {
           ProjectTypeListCycleSchema,
           RowVersionListSchema,
         ],
+        name: 'HCM',
         inspector: true,
         directory: directory.path,
       );
@@ -108,12 +102,8 @@ class Constants {
     }
   }
 
-// Tempororily created editButtonShow boolean value to adjust some feature interms of showing and hiding
-  static const bool editButtonShow = true;
   static const String localizationApiPath = 'localization/messages/v1/_search';
   static const String projectSearchApiPath = '/project/v1/_search';
-  static const String logoutUserPath = '/user/_logout';
-  static const String invalidAccessTokenKey = 'InvalidAccessTokenException';
 
   static List<LocalRepository> getLocalRepositories(
     LocalSqlDataStore sql,
@@ -135,8 +125,8 @@ class Constants {
       ProjectStaffLocalRepository(sql, ProjectStaffOpLogManager(isar)),
       StockLocalRepository(sql, StockOpLogManager(isar)),
       TaskLocalRepository(sql, TaskOpLogManager(isar)),
-      ReferralLocalRepository(sql, ReferralOpLogManager(isar)),
       SideEffectLocalRepository(sql, SideEffectOpLogManager(isar)),
+      ReferralLocalRepository(sql, ReferralOpLogManager(isar)),
       StockReconciliationLocalRepository(
         sql,
         StockReconciliationOpLogManager(isar),
@@ -165,13 +155,9 @@ class Constants {
         sql,
         PgrServiceOpLogManager(isar),
       ),
-      AttendanceLocalRepository(
+      HFReferralLocalRepository(
         sql,
-        AttendanceOpLogManager(isar),
-      ),
-      AttendanceLogsLocalRepository(
-        sql,
-        AttendanceLogOpLogManager(isar),
+        HFReferralOpLogManager(isar),
       ),
     ];
   }
@@ -185,14 +171,6 @@ class Constants {
 
     final enableCrashlytics =
         config?.firebaseConfig?.enableCrashlytics ?? false;
-    if (enableCrashlytics) {
-      firebase_services.initialize(
-        options: DefaultFirebaseOptions.currentPlatform,
-        onErrorMessage: (value) {
-          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-        },
-      );
-    }
 
     _version = version;
   }
@@ -250,10 +228,10 @@ class Constants {
           SideEffectRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.referral)
           ReferralRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.attendanceRegister)
-          AttendanceRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.attendance)
-          AttendanceLogRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.downsync)
+          DownsyncRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.hFReferral)
+          HFReferralRemoteRepository(dio, actionMap: actions),
       ]);
     }
 
@@ -333,15 +311,14 @@ class EntityPlurals {
         return 'StockReconciliation';
       case 'User':
         return 'user';
-      case 'AttendanceRegister':
-        return 'attendanceRegister';
-      case 'Attendance':
-        return 'attendance';
       default:
         return '${entity}s';
     }
   }
 }
+
+const String noResultSvg = 'assets/icons/svg/no_result.svg';
+const String myChecklistSvg = 'assets/icons/svg/mychecklist.svg';
 
 enum DigitProgressDialogType {
   inProgress,
@@ -403,32 +380,10 @@ class DataModels {
         return DataModelType.sideEffect;
       case 'Referrals':
         return DataModelType.referral;
+      case 'HFReferrals':
+        return DataModelType.hFReferral;
       default:
         return DataModelType.householdMember;
     }
-  }
-}
-
-class ApiUtil {
-  static String fetchIndividuals({
-    required int limit,
-    required int offset,
-    required String tenantId,
-    bool isDeleted = false,
-  }) {
-    return "individual/v1/_search?limit=$limit&offset=$offset&tenantId=$tenantId";
-    // individual/v1/_search?limit=1000&offset=0&tenantId=lb
-  }
-
-  static String fetchRegisters(String projectId, String tenantId) {
-    return "attendance/v1/_search?tenantId=$tenantId&referenceId=$projectId";
-  }
-
-  static String fetchIndividualAttendanceLog() {
-    return "";
-  }
-
-  static String createAttendanceLog() {
-    return "attendance/log/v1/_create";
   }
 }

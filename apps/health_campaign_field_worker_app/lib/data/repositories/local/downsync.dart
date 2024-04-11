@@ -24,8 +24,6 @@ class DownsyncLocalRepository
         mode: InsertMode.insertOrReplace,
       );
     });
-
-    await super.create(entity, createOpLog: false);
   }
 
   @override
@@ -40,7 +38,7 @@ class DownsyncLocalRepository
         sql.downsync,
         downSyncCompanion,
         where: (table) => table.locality.equals(
-          entity.locality!,
+          entity.locality,
         ),
       );
     });
@@ -61,7 +59,7 @@ class DownsyncLocalRepository
           ..where(
             buildAnd([
               if (query.locality != null)
-                sql.downsync.locality.equals(query.locality!),
+                sql.downsync.locality.equals(query.locality),
             ]),
           ))
         .get();
@@ -81,8 +79,4 @@ class DownsyncLocalRepository
       );
     }).toList();
   }
-
-  @override
-  // TODO: implement table
-  TableInfo<Table, dynamic> get table => throw UnimplementedError();
 }

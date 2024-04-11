@@ -4,9 +4,10 @@ import 'package:drift/drift.dart';
 
 import '../../../models/data_model.dart';
 import '../../../utils/utils.dart';
-import 'base/stock_base.dart';
+import '../../data_repository.dart';
 
-class StockLocalRepository extends StockLocalBaseRepository {
+class StockLocalRepository
+    extends LocalRepository<StockModel, StockSearchModel> {
   StockLocalRepository(super.sql, super.opLogManager);
 
   @override
@@ -15,7 +16,9 @@ class StockLocalRepository extends StockLocalBaseRepository {
     bool createOpLog = true,
     DataOperation dataOperation = DataOperation.create,
   }) async {
-    final stockCompanion = entity.companion;
+    final stockCompanion = entity.companion.copyWith(
+      transactionType: Value(entity.companion.transactionType.value),
+    );
     await sql.batch((batch) {
       batch.insert(sql.stock, stockCompanion);
     });
@@ -32,11 +35,13 @@ class StockLocalRepository extends StockLocalBaseRepository {
           ..where(
             buildAnd(
               [
-                if (query.id != null) sql.stock.id.equals(query.id!),
-                if (query.facilityId != null)
-                  sql.stock.facilityId.equals(query.facilityId!),
+                if (query.id != null) sql.stock.id.equals(query.id),
+                if (query.receiverId != null)
+                  sql.stock.receiverId.equals(query.receiverId),
+                if (query.senderId != null)
+                  sql.stock.senderId.equals(query.senderId),
                 if (query.productVariantId != null)
-                  sql.stock.productVariantId.equals(query.productVariantId!),
+                  sql.stock.productVariantId.equals(query.productVariantId),
                 if (query.clientReferenceId != null)
                   sql.stock.clientReferenceId.isIn(query.clientReferenceId!),
                 if (userId != null)
@@ -71,6 +76,10 @@ class StockLocalRepository extends StockLocalBaseRepository {
         tenantId: data.tenantId,
         facilityId: data.facilityId,
         productVariantId: data.productVariantId,
+        receiverId: data.receiverId,
+        senderId: data.senderId,
+        receiverType: data.receiverType,
+        senderType: data.senderType,
         referenceId: data.referenceId,
         referenceIdType: data.referenceIdType,
         transactionType: data.transactionType,
@@ -82,7 +91,6 @@ class StockLocalRepository extends StockLocalBaseRepository {
         clientReferenceId: data.clientReferenceId,
         isDeleted: data.isDeleted,
         rowVersion: data.rowVersion,
-        dateOfEntry: data.dateOfEntry,
         auditDetails: createdTime == null || createdBy == null
             ? null
             : AuditDetails(createdTime: createdTime, createdBy: createdBy),
@@ -117,4 +125,7 @@ class StockLocalRepository extends StockLocalBaseRepository {
 
     return super.update(entity, createOpLog: createOpLog);
   }
+
+  @override
+  DataModelType get type => DataModelType.stock;
 }

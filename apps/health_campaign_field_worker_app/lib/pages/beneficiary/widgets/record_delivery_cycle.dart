@@ -32,6 +32,7 @@ class RecordDeliveryCycle extends LocalizedStatefulWidget {
 
 class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
   bool isExpanded = false;
+  bool isDivider = false;
 
   @override
   Widget build(BuildContext context) {
@@ -102,32 +103,45 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
                                         onTap: () {
                                           setState(() {
                                             isExpanded = !isExpanded;
+                                            isDivider = !isDivider;
                                           });
                                         },
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            TextButton(
-                                              onPressed: null,
-                                              child: Text(
-                                                style: TextStyle(
-                                                  fontSize: kPadding * 2,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: kPadding / 2,
+                                              ),
+                                              child: TextButton(
+                                                style: TextButton.styleFrom(
+                                                  padding: const EdgeInsets.all(
+                                                    0,
+                                                  ),
                                                 ),
-                                                isExpanded
-                                                    ? localizations.translate(
-                                                        i18.deliverIntervention
-                                                            .hidePastCycles,
-                                                      )
-                                                    : localizations.translate(
-                                                        i18.deliverIntervention
-                                                            .viewPastCycles,
-                                                      ),
+                                                onPressed: null,
+                                                child: Text(
+                                                  style: TextStyle(
+                                                    fontSize: kPadding * 2,
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary,
+                                                  ),
+                                                  isExpanded
+                                                      ? localizations.translate(
+                                                          i18.deliverIntervention
+                                                              .hidePastCycles,
+                                                        )
+                                                      : localizations.translate(
+                                                          i18.deliverIntervention
+                                                              .viewPastCycles,
+                                                        ),
+                                                ),
                                               ),
                                             ),
                                             !isExpanded
@@ -136,12 +150,14 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
                                                         .colorScheme
                                                         .secondary,
                                                     Icons.keyboard_arrow_down,
+                                                    size: 24,
                                                   )
                                                 : Icon(
                                                     color: Theme.of(context)
                                                         .colorScheme
                                                         .secondary,
                                                     Icons.keyboard_arrow_up,
+                                                    size: 24,
                                                   ),
                                           ],
                                         ),
@@ -181,12 +197,20 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
         Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+              padding: isCurrentCycle
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.only(
+                      top: kPadding + 2,
+                      bottom: 0,
+                    ),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} ${e.id}',
-                  style: theme.textTheme.headlineMedium,
+                  isCurrentCycle
+                      ? localizations
+                          .translate(i18.beneficiaryDetails.currentCycleLabel)
+                      : '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} ${e.id}',
+                  style: theme.textTheme.headlineLarge,
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -220,7 +244,7 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
 
                   return TableDataRow([
                     TableData(
-                      '${localizations.translate(i18.beneficiaryDetails.beneficiaryDeliveryText)} ${e.deliveries!.indexOf(item) + 1}',
+                      'Dose ${e.deliveries!.indexOf(item) + 1}',
                       cellKey: 'dose',
                     ),
                     TableData(
@@ -243,10 +267,8 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
                       ),
                     ),
                     TableData(
-                      tasks?.status ==
-                              Status.administeredFailed.toValue()
-                          ? '--'
-                          : (tasks?.additionalFields?.fields
+                      tasks?.status == Status.administeredFailed.toValue() ||
+                              (tasks?.additionalFields?.fields
                                       .where((e) =>
                                           e.key ==
                                           AdditionalFieldsType.deliveryStrategy
@@ -254,30 +276,24 @@ class _RecordDeliveryCycleState extends LocalizedState<RecordDeliveryCycle> {
                                       .firstOrNull
                                       ?.value ==
                                   DeliverStrategyType.indirect.toValue())
-                              ? (int.parse(tasks?.additionalFields?.fields
-                                              .where((e) =>
-                                                  e.key ==
-                                                  AdditionalFieldsType
-                                                      .dateOfAdministration
-                                                      .toValue())
-                                              .firstOrNull
-                                              ?.value) +
-                                          (item.id - 1) * 24 * 60 * 60 * 1000)
-                                      .toDateTime
-                                      .getFormattedDate() ??
-                                  '--'
-                              : tasks?.clientAuditDetails?.createdTime
-                                      .toDateTime
-                                      .getFormattedDate() ??
-                                  ' -- ',
+                          ? ' -- '
+                          : tasks?.clientAuditDetails?.createdTime.toDateTime
+                                  .getFormattedDate() ??
+                              ' -- ',
                       cellKey: 'completedOn',
                     ),
                   ]);
                 },
               ).toList(),
-              columnWidth: 115,
+              columnWidth: 130,
               height: ((e.deliveries?.length ?? 0) + 1) * 57.5,
             ),
+            const SizedBox(
+              height: 16,
+            ),
+              const Divider(
+                thickness: 1.0,
+              ),
           ],
         ),
       );

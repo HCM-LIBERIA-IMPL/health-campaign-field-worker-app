@@ -24,7 +24,7 @@
       "includeForEntity": false,
       "includeForTable": false
     },
-    {
+     {
       "name": "householdId",
       "type": "String",
       "includeForQuery": true

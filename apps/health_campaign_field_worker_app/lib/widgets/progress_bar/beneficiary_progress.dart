@@ -35,6 +35,23 @@ class _BeneficiaryProgressBarState extends State<BeneficiaryProgressBar> {
                 ProjectBeneficiarySearchModel>>()
         as ProjectBeneficiaryLocalRepository;
 
+    final now = DateTime.now();
+    final gte = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
+
+    final lte = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      23,
+      59,
+      59,
+      999,
+    );
+
     repository.listenToChanges(
       query: ProjectBeneficiarySearchModel(
         projectId: context.projectId,
@@ -42,26 +59,8 @@ class _BeneficiaryProgressBarState extends State<BeneficiaryProgressBar> {
       listener: (data) {
         if (mounted) {
           setState(() {
-            final now = DateTime.now();
-            final gte = DateTime(
-              now.year,
-              now.month,
-              now.day,
-            );
-
-            final lte = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              23,
-              59,
-              59,
-              999,
-            );
             current = data
                 .where((element) =>
-                    element.auditDetails?.createdBy ==
-                        context.loggedInUserUuid &&
                     element.dateOfRegistrationTime.isAfter(gte) &&
                     (element.isDeleted == false || element.isDeleted == null) &&
                     element.dateOfRegistrationTime.isBefore(lte))
@@ -75,7 +74,14 @@ class _BeneficiaryProgressBarState extends State<BeneficiaryProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    const target = 50;
+    final selectedProject = context.selectedProject;
+    final beneficiaryType = context.beneficiaryType;
+
+    final targetModel = selectedProject.targets?.firstWhereOrNull(
+      (element) => element.beneficiaryType == beneficiaryType,
+    );
+
+    final target = targetModel?.targetNo ?? 0.0;
 
     return DigitCard(
       child: ProgressIndicatorContainer(

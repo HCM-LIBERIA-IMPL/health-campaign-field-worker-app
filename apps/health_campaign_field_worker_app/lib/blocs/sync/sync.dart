@@ -16,11 +16,11 @@ part 'sync.freezed.dart';
 typedef SyncEmitter = Emitter<SyncState>;
 
 class SyncBloc extends Bloc<SyncEvent, SyncState> {
-  final Future<Isar> isarState;
+  final Isar isar;
   final NetworkManager networkManager;
 
   SyncBloc({
-    required this.isarState,
+    required this.isar,
     required this.networkManager,
   }) : super(const SyncPendingState()) {
     on(_handleRefresh);
@@ -39,8 +39,6 @@ class SyncBloc extends Bloc<SyncEvent, SyncState> {
     int? length = event.count;
     emit(const SyncState.loading());
     try {
-      final isar = await isarState;
-
       length ??= (await isar.opLogs
                   .filter()
                   .createdByEqualTo(event.createdBy)
@@ -59,7 +57,7 @@ class SyncBloc extends Bloc<SyncEvent, SyncState> {
               case DataModelType.complaints:
               case DataModelType.sideEffect:
               case DataModelType.referral:
-              case DataModelType.attendance:
+              case DataModelType.hFReferral:
                 return true;
               default:
                 return false;
@@ -74,6 +72,7 @@ class SyncBloc extends Bloc<SyncEvent, SyncState> {
               .where((element) {
             switch (element.entityType) {
               case DataModelType.household:
+              case DataModelType.householdMember:
               case DataModelType.individual:
               case DataModelType.projectBeneficiary:
               case DataModelType.task:
@@ -82,8 +81,7 @@ class SyncBloc extends Bloc<SyncEvent, SyncState> {
               case DataModelType.complaints:
               case DataModelType.sideEffect:
               case DataModelType.referral:
-              case DataModelType.householdMember:
-              case DataModelType.attendance:
+              case DataModelType.hFReferral:
                 return true;
               default:
                 return false;

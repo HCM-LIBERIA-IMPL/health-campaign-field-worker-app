@@ -5,10 +5,8 @@ import 'package:drift/drift.dart';
 import '../data_model.dart';
 import '../../data/local_store/sql_store/sql_store.dart';
 
-part 'referral.mapper.dart';
-
-@MappableClass(ignoreNull: true, discriminatorValue: MappableClass.useAsDefault)
-class ReferralSearchModel extends EntitySearchModel with ReferralSearchModelMappable {
+@MappableClass(ignoreNull: true)
+class ReferralSearchModel extends EntitySearchModel {
   final String? id;
   final List<String>? projectBeneficiaryClientReferenceId;
   final String? projectId;
@@ -48,8 +46,8 @@ class ReferralSearchModel extends EntitySearchModel with ReferralSearchModelMapp
   }):  super(isDeleted: false);
 }
 
-@MappableClass(ignoreNull: true, discriminatorValue: MappableClass.useAsDefault)
-class ReferralModel extends EntityModel with ReferralModelMappable {
+@MappableClass(ignoreNull: true)
+class ReferralModel extends EntityModel {
 
   static const schemaName = 'Referral';
 
@@ -110,12 +108,11 @@ class ReferralModel extends EntityModel with ReferralModelMappable {
   }
 }
 
-@MappableClass(ignoreNull: true, discriminatorValue: MappableClass.useAsDefault)
-class ReferralAdditionalFields extends AdditionalFields with ReferralAdditionalFieldsMappable {
+@MappableClass(ignoreNull: true)
+class ReferralAdditionalFields extends AdditionalFields {
   ReferralAdditionalFields({
     super.schema = 'Referral',
     required super.version,
     super.fields,
   });
 }
-

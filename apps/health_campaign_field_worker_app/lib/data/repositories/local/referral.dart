@@ -5,9 +5,10 @@ import 'package:drift/drift.dart';
 
 import '../../../models/data_model.dart';
 import '../../../utils/utils.dart';
-import 'base/referral_base.dart';
+import '../../data_repository.dart';
 
-class ReferralLocalRepository extends ReferralLocalBaseRepository {
+class ReferralLocalRepository
+    extends LocalRepository<ReferralModel, ReferralSearchModel> {
   ReferralLocalRepository(super.sql, super.opLogManager);
 
   void listenToChanges({
@@ -19,7 +20,7 @@ class ReferralLocalRepository extends ReferralLocalBaseRepository {
         buildOr([
           if (query.id != null)
             sql.referral.id.equals(
-              query.id!,
+              query.id,
             ),
         ]),
       );
@@ -154,4 +155,7 @@ class ReferralLocalRepository extends ReferralLocalBaseRepository {
 
     await super.update(entity, createOpLog: createOpLog);
   }
+
+  @override
+  DataModelType get type => DataModelType.referral;
 }

@@ -14,7 +14,6 @@ import '../../local_store/no_sql/schema/app_configuration.dart';
 import '../../local_store/no_sql/schema/project_types.dart';
 import '../../local_store/no_sql/schema/row_versions.dart';
 import '../../local_store/no_sql/schema/service_registry.dart';
-import '../../local_store/secure_store/secure_store.dart';
 
 class MdmsRepository {
   final Dio _client;
@@ -135,10 +134,6 @@ class MdmsRepository {
             element.backgroundServiceConfig?.batteryPercentCutOff
         ..serviceInterval = element.backgroundServiceConfig?.serviceInterval;
 
-      final firebaseConfig = FirebaseConfig()
-        ..enableCrashlytics = element.firebaseConfig.enableCrashlytics
-        ..enableAnalytics = element.firebaseConfig.enableAnalytics;
-
       appConfiguration
         ..networkDetection = element.networkDetection
         ..persistenceMode = element.persistenceMode
@@ -146,8 +141,7 @@ class MdmsRepository {
         ..syncTrigger = element.syncTrigger
         ..tenantId = element.tenantId
         ..maxRadius = element.maxRadius
-        ..backgroundServiceConfig = backgroundServiceConfig
-        ..firebaseConfig = firebaseConfig;
+        ..backgroundServiceConfig = backgroundServiceConfig;
 
       final List<Languages> languageList = element.languages.map((element) {
         final languages = Languages()
@@ -240,15 +234,6 @@ class MdmsRepository {
         return deliveryCommentOption;
       }).toList();
 
-      final List<DeliveryCommentOptions> deliveryCommentOptionsSmc =
-          element.deliveryCommentOptionsSmc.map((element) {
-        final deliveryCommentOption = DeliveryCommentOptions()
-          ..name = element.name
-          ..code = element.code;
-
-        return deliveryCommentOption;
-      }).toList();
-
       final List<Interfaces> interfaceList =
           element.backendInterface.interface.map((e) {
         final config = Config()..localStoreTTL = e.config.localStoreTTL;
@@ -274,7 +259,6 @@ class MdmsRepository {
       appConfiguration.genderOptions = genderOptions;
       appConfiguration.idTypeOptions = idTypeOptions;
       appConfiguration.deliveryCommentOptions = deliveryCommentOptions;
-      appConfiguration.deliveryCommentOptionsSmc = deliveryCommentOptionsSmc;
       appConfiguration.householdDeletionReasonOptions =
           householdDeletionReasonOptions;
       appConfiguration.householdMemberDeletionReasonOptions =
@@ -307,16 +291,6 @@ class MdmsRepository {
       return reasonTypes;
     }).toList();
 
-    appConfiguration.ineligibilityReasons =
-        result.ineligibilityReasons?.ineligibilityReasonsList?.map((e) {
-      final reasonTypes = IneligibilityReasons()
-        ..name = e.name
-        ..code = e.code
-        ..active = e.active;
-
-      return reasonTypes;
-    }).toList();
-
     await isar.writeTxn(() async {
       await isar.appConfigurations.put(appConfiguration);
       await isar.rowVersionLists.putAll(rowVersionList);
@@ -340,80 +314,14 @@ class MdmsRepository {
 
   Future<RoleActionsWrapperModel> searchRoleActions(
     String apiEndPoint,
-    LocalSecureStore localSecureStore,
     Map<String, dynamic> body,
   ) async {
     try {
       final Response response = await _client.post(apiEndPoint, data: body);
-      await localSecureStore.setRoleActions(response.toString());
 
       return RoleActionsWrapperModel.fromJson(json.decode(response.toString()));
     } catch (_) {
       rethrow;
     }
-  }
-
-  FutureOr<void> writeToProjectTypeDB(
-    ProjectTypePrimaryWrapper result,
-    Isar isar,
-  ) async {
-    final List<ProjectTypeListCycle> newProjectTypeList = [];
-    final data = result.projectTypeWrapper?.projectTypes;
-    if (data != null && data.isNotEmpty) {
-      await isar.writeTxn(() async => await isar.projectTypeListCycles.clear());
-    }
-    for (final element in data ?? <ProjectType>[]) {
-      final newprojectType = ProjectTypeListCycle();
-
-      newprojectType.projectTypeId = element.id;
-      newprojectType.code = element.code;
-      newprojectType.group = element.group;
-      newprojectType.name = element.name;
-      newprojectType.beneficiaryType = element.beneficiaryType;
-      newprojectType.observationStrategy = element.observationStrategy;
-      newprojectType.resources = element.resources?.map((e) {
-        final productVariants = ProductVariants()
-          ..productVariantId = e.productVariantId
-          ..quantity = e.quantity.toString();
-
-        return productVariants;
-      }).toList();
-      newprojectType.cycles = element.cycles?.map((e) {
-        final newcycle = Cycles()
-          ..id = e.id
-          ..startDate = e.startDate
-          ..endDate = e.endDate
-          ..mandatoryWaitSinceLastCycleInDays =
-              e.mandatoryWaitSinceLastCycleInDays
-          ..deliveries = e.deliveries?.map((ele) {
-            final newDeliveries = Deliveries();
-            newDeliveries.deliveryStrategy = ele.deliveryStrategy;
-            newDeliveries.mandatoryWaitSinceLastDeliveryInDays =
-                ele.mandatoryWaitSinceLastDeliveryInDays;
-            newDeliveries.doseCriteriaModel = ele.doseCriteria?.map((e) {
-              final doseCriterias = DoseCriteria()
-                ..condition = e.condition
-                ..productVariants = e.productVariants?.map((p) {
-                  final productVariants = ProductVariants()
-                    ..quantity = p.quantity.toString()
-                    ..productVariantId = p.productVariantId.toString();
-
-                  return productVariants;
-                }).toList();
-
-              return doseCriterias;
-            }).toList();
-
-            return newDeliveries;
-          }).toList();
-
-        return newcycle;
-      }).toList();
-      newProjectTypeList.add(newprojectType);
-    }
-
-    await isar.writeTxn(() async {
-      await isar.projectTypeListCycles.putAll(newProjectTypeList);
-    });
   }
 }

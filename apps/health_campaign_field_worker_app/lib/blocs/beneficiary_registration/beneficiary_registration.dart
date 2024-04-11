@@ -117,8 +117,6 @@ class BeneficiaryRegistrationBloc
         throw const InvalidRegistrationStateException();
       },
       create: (value) async {
-        final startTime = value.startTime;
-
         final individual = value.individualModel;
         final household = value.householdModel;
         final address = value.addressModel;
@@ -200,23 +198,6 @@ class BeneficiaryRegistrationBloc
                 createdBy: event.userUuid,
                 createdTime: createdAt,
               ),
-              additionalFields: ProjectBeneficiaryAdditionalFields(
-                version: 1,
-                fields: [
-                  AdditionalField(
-                    "startTime",
-                    startTime,
-                  ),
-                  AdditionalField(
-                    "endTime",
-                    createdAt,
-                  ),
-                  AdditionalField(
-                    "differenceTime",
-                    (createdAt - startTime!),
-                  ),
-                ],
-              ),
             ),
           );
 
@@ -266,11 +247,6 @@ class BeneficiaryRegistrationBloc
       editHousehold: (value) async {
         emit(value.copyWith(loading: true));
         try {
-          final HouseholdModel? existingHousehold =
-              (await householdRepository.search(HouseholdSearchModel(
-            clientReferenceId: [value.householdModel.clientReferenceId],
-          )))
-                  .firstOrNull;
           await householdRepository.update(
             value.householdModel.copyWith(
               clientAuditDetails: ClientAuditDetails(
@@ -286,10 +262,6 @@ class BeneficiaryRegistrationBloc
                 relatedClientReferenceId:
                     value.householdModel.clientReferenceId,
               ),
-              id: existingHousehold?.id,
-              rowVersion: existingHousehold?.rowVersion ?? 1,
-              nonRecoverableError:
-                  existingHousehold?.nonRecoverableError ?? false,
             ),
           );
           final projectBeneficiary = await projectBeneficiaryRepository.search(
@@ -306,11 +278,6 @@ class BeneficiaryRegistrationBloc
           }
 
           for (var element in value.individualModel) {
-            final IndividualModel? existingIndividual =
-                (await individualRepository.search(IndividualSearchModel(
-              clientReferenceId: [element.clientReferenceId],
-            )))
-                    .firstOrNull;
             await individualRepository.update(
               element.copyWith(
                 address: [
@@ -322,10 +289,6 @@ class BeneficiaryRegistrationBloc
                       );
                     }),
                 ],
-                id: existingIndividual?.id,
-                rowVersion: existingIndividual?.rowVersion ?? 1,
-                nonRecoverableError:
-                    existingIndividual?.nonRecoverableError ?? false,
               ),
             );
           }
@@ -361,23 +324,17 @@ class BeneficiaryRegistrationBloc
               ),
             ],
           );
+
           final projectBeneficiary = await projectBeneficiaryRepository.search(
             ProjectBeneficiarySearchModel(
-              beneficiaryClientReferenceId: [event.model.clientReferenceId],
+              beneficiaryClientReferenceId: [
+                beneficiaryType == BeneficiaryType.individual
+                    ? event.model.clientReferenceId
+                    : event.householdModel.clientReferenceId,
+              ],
             ),
           );
-          final IndividualModel? existingIndividual =
-              (await individualRepository.search(IndividualSearchModel(
-            clientReferenceId: [individual.clientReferenceId],
-          )))
-                  .firstOrNull;
-
-          await individualRepository.update(individual.copyWith(
-            id: existingIndividual?.id,
-            rowVersion: existingIndividual?.rowVersion ?? 1,
-            nonRecoverableError:
-                existingIndividual?.nonRecoverableError ?? false,
-          ));
+          await individualRepository.update(individual);
           if (projectBeneficiary.isNotEmpty) {
             if (projectBeneficiary.first.tag != event.tag) {
               await projectBeneficiaryRepository
@@ -411,7 +368,6 @@ class BeneficiaryRegistrationBloc
             event.individualModel.copyWith(
               address: [
                 value.addressModel.copyWith(
-                  id: null,
                   relatedClientReferenceId:
                       event.individualModel.clientReferenceId,
                 ),
@@ -517,6 +473,7 @@ class BeneficiaryRegistrationEvent with _$BeneficiaryRegistrationEvent {
   const factory BeneficiaryRegistrationEvent.updateIndividualDetails({
     required IndividualModel model,
     String? tag,
+    required HouseholdModel householdModel,
     required AddressModel addressModel,
   }) = BeneficiaryRegistrationUpdateIndividualDetailsEvent;
 
@@ -540,7 +497,6 @@ class BeneficiaryRegistrationState with _$BeneficiaryRegistrationState {
     IndividualModel? individualModel,
     DateTime? registrationDate,
     String? searchQuery,
-    int? startTime,
     @Default(false) bool loading,
     @Default(false) bool isHeadOfHousehold,
   }) = BeneficiaryRegistrationCreateState;

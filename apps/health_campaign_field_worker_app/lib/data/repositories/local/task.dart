@@ -5,10 +5,9 @@ import 'package:drift/drift.dart';
 
 import '../../../models/data_model.dart';
 import '../../../utils/utils.dart';
-import '../../local_store/sql_store/sql_store.dart';
-import 'base/task_base.dart';
+import '../../data_repository.dart';
 
-class TaskLocalRepository extends TaskLocalBaseRepository {
+class TaskLocalRepository extends LocalRepository<TaskModel, TaskSearchModel> {
   TaskLocalRepository(super.sql, super.opLogManager);
 
   void listenToChanges({
@@ -27,7 +26,7 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
         buildOr([
           if (query.projectId != null)
             sql.task.projectId.equals(
-              query.projectId!,
+              query.projectId,
             ),
         ]),
       );
@@ -160,7 +159,7 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
           createdDate: task.createdDate,
           additionalFields: task.additionalFields == null
               ? null
-              : TaskAdditionalFieldsMapper.fromJson(
+              : Mapper.fromJson<TaskAdditionalFields>(
                   task.additionalFields!,
                 ),
           address: address == null
@@ -304,38 +303,41 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
   ) async {
     final taskCompanions = entities.map((e) => e.companion).toList();
 
-    List<AddressCompanion> addressCompanions = [];
-    List<TaskResourceCompanion> resourceCompanions = [];
+    final resourcesList = entities
+        .map((e) => e.resources?.map((a) {
+              return a
+                  .copyWith(
+                    clientReferenceId: a.clientReferenceId,
+                    taskclientReferenceId: e.clientReferenceId,
+                    clientAuditDetails: e.clientAuditDetails,
+                    auditDetails: e.auditDetails,
+                  )
+                  .companion;
+            }).toList())
+        .toList();
 
-    for (TaskModel entity in entities) {
-      final addressCompanion = entity.address
-          ?.copyWith(
-            relatedClientReferenceId: entity.clientReferenceId,
-            auditDetails: entity.auditDetails,
-            clientAuditDetails: entity.clientAuditDetails,
-          )
-          .companion;
-      if (addressCompanion != null) {
-        addressCompanions.add(addressCompanion);
-      }
-
-      final resources = entity.resources?.map((e) {
-            return e
-                .copyWith(
-                  taskclientReferenceId: entity.clientReferenceId,
-                )
-                .companion;
-          }).toList() ??
-          [];
-      resourceCompanions.addAll(resources);
-    }
+    final resourcesCompanions = resourcesList.expand((e) => [e?[0]]).toList();
 
     await sql.batch((batch) async {
-      batch.insertAll(
-        sql.task,
-        taskCompanions,
-        mode: InsertMode.insertOrReplace,
-      );
+      final addressCompanions = entities.map((e) {
+        if (e.address != null) {
+          return e.address!
+              .copyWith(
+                relatedClientReferenceId: e.clientReferenceId,
+                clientAuditDetails: e.clientAuditDetails,
+                auditDetails: e.auditDetails,
+              )
+              .companion;
+        }
+      }).toList();
+
+      if (resourcesCompanions.isNotEmpty) {
+        batch.insertAll(
+          sql.taskResource,
+          resourcesCompanions.whereNotNull().toList(),
+          mode: InsertMode.insertOrReplace,
+        );
+      }
 
       if (addressCompanions.isNotEmpty) {
         batch.insertAll(
@@ -345,7 +347,11 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
         );
       }
 
-      batch.insertAllOnConflictUpdate(sql.taskResource, resourceCompanions);
+      batch.insertAll(
+        sql.task,
+        taskCompanions,
+        mode: InsertMode.insertOrReplace,
+      );
     });
   }
 
@@ -367,6 +373,7 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
     final resourcesCompanions = entity.resources?.map((e) {
           return e
               .copyWith(
+                clientReferenceId: e.clientReferenceId,
                 taskclientReferenceId: entity.clientReferenceId,
               )
               .companion;
@@ -387,7 +394,7 @@ class TaskLocalRepository extends TaskLocalBaseRepository {
           sql.address,
           addressCompanion,
           where: (table) => table.relatedClientReferenceId.equals(
-            addressCompanion.relatedClientReferenceId.value!,
+            addressCompanion.relatedClientReferenceId.value,
           ),
         );
       }

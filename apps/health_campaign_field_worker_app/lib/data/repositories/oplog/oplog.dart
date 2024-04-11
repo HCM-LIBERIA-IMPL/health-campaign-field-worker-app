@@ -122,14 +122,14 @@ abstract class OpLogManager<T extends EntityModel> {
         .sortedBy((element) => element.createdAt)
         .where(
           (element) => element.entityType != DataModelType.service,
-          // Added Memeber and service so that we don't get the respose from the server
+          // Added service so that we don't get the response from the server
         )
         .toList();
 
     return oplogs.map((e) => OpLogEntry.fromOpLog<T>(e)).toList();
   }
 
-  Future<void> put(OpLogEntry<dynamic> entry) async {
+  Future<void> put(OpLogEntry<T> entry) async {
     await isar.writeTxn(() async {
       await isar.opLogs.put(entry
           .copyWith(
@@ -210,7 +210,11 @@ abstract class OpLogManager<T extends EntityModel> {
         .clientReferenceIdEqualTo(model.clientReferenceId)
         .findAll();
 
-    for (final oplog in opLogs) {
+    for (final oplog in opLogs
+        .where(
+          (element) => element.entityType.name != DataModelType.service.name,
+        )
+        .toList()) {
       final entry = OpLogEntry.fromOpLog<T>(oplog);
 
       OpLogEntry updatedEntry = entry.copyWith(
@@ -590,6 +594,32 @@ class ReferralOpLogManager extends OpLogManager<ReferralModel> {
       entity.nonRecoverableError;
 }
 
+class HFReferralOpLogManager extends OpLogManager<HFReferralModel> {
+  HFReferralOpLogManager(super.isar);
+
+  @override
+  HFReferralModel applyServerGeneratedIdToEntity(
+    HFReferralModel entity,
+    String serverGeneratedId,
+    int rowVersion,
+  ) =>
+      entity.copyWith(id: serverGeneratedId, rowVersion: rowVersion);
+
+  @override
+  String getClientReferenceId(HFReferralModel entity) =>
+      entity.clientReferenceId;
+
+  @override
+  String? getServerGeneratedId(HFReferralModel entity) => entity.id;
+
+  @override
+  int? getRowVersion(HFReferralModel entity) => entity.rowVersion;
+
+  @override
+  bool? getNonRecoverableError(HFReferralModel entity) =>
+      entity.nonRecoverableError;
+}
+
 class ProjectStaffOpLogManager extends OpLogManager<ProjectStaffModel> {
   ProjectStaffOpLogManager(super.isar);
 
@@ -934,70 +964,6 @@ class PgrServiceOpLogManager extends OpLogManager<PgrServiceModel> {
 
     return entriesList;
   }
-}
-
-class AttendanceOpLogManager extends OpLogManager<HCMAttendanceRegisterModel> {
-  AttendanceOpLogManager(super.isar);
-
-  @override
-  HCMAttendanceRegisterModel applyServerGeneratedIdToEntity(
-    HCMAttendanceRegisterModel entity,
-    String serverGeneratedId,
-    int rowVersion,
-  ) =>
-      throw UnimplementedError();
-
-  @override
-  String getClientReferenceId(HCMAttendanceRegisterModel entity) =>
-      throw UnimplementedError();
-  //ClientreferenceId is not needed for register
-
-  @override
-  String? getServerGeneratedId(HCMAttendanceRegisterModel entity) =>
-      throw UnimplementedError();
-  //Not being used for down sync using client referenceIds
-
-  @override
-  int? getRowVersion(HCMAttendanceRegisterModel entity) =>
-      throw UnimplementedError();
-  //Not being used for down sync using client referenceIds
-
-  @override
-  bool? getNonRecoverableError(HCMAttendanceRegisterModel entity) =>
-      throw UnimplementedError();
-//Not being used for down sync using client referenceIds
-}
-
-class AttendanceLogOpLogManager extends OpLogManager<HCMAttendanceLogModel> {
-  AttendanceLogOpLogManager(super.isar);
-
-  @override
-  HCMAttendanceLogModel applyServerGeneratedIdToEntity(
-    HCMAttendanceLogModel entity,
-    String serverGeneratedId,
-    int rowVersion,
-  ) =>
-      entity.copyWith(
-        attendance: entity.attendance?.copyWith(
-          id: serverGeneratedId,
-        ),
-        rowVersion: rowVersion,
-      );
-
-  @override
-  String getClientReferenceId(HCMAttendanceLogModel entity) =>
-      entity.attendance!.clientReferenceId.toString();
-
-  @override
-  String? getServerGeneratedId(HCMAttendanceLogModel entity) =>
-      entity.attendance?.id;
-
-  @override
-  int? getRowVersion(HCMAttendanceLogModel entity) => entity.rowVersion;
-
-  @override
-  bool? getNonRecoverableError(HCMAttendanceLogModel entity) =>
-      entity.nonRecoverableError;
 }
 
 class UpdateServerGeneratedIdModel {

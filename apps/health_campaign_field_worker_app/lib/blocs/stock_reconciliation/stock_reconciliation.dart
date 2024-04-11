@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../data/local_store/secure_store/secure_store.dart';
 import '../../models/data_model.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/typedefs.dart';
@@ -24,7 +25,6 @@ class StockReconciliationBloc
   }) {
     on(_handleSelectFacility);
     on(_handleSelectProduct);
-    on(_handleSelectDateOfReconciliation);
     on(_handleCalculate);
     on(_handleCreate);
   }
@@ -42,15 +42,9 @@ class StockReconciliationBloc
     StockReconciliationEmitter emit,
   ) async {
     emit(state.copyWith(productVariantId: event.productVariantId));
-    add(const StockReconciliationCalculateEvent());
-  }
-
-  FutureOr<void> _handleSelectDateOfReconciliation(
-    StockReconciliationSelectDateOfReconciliationEvent event,
-    StockReconciliationEmitter emit,
-  ) async {
-    emit(state.copyWith(dateOfReconciliation: event.dateOfReconciliation!));
-    add(const StockReconciliationCalculateEvent());
+    add(StockReconciliationCalculateEvent(
+      isDistributor: event.isDistributor,
+    ));
   }
 
   FutureOr<void> _handleCalculate(
@@ -61,30 +55,37 @@ class StockReconciliationBloc
 
     final productVariantId = state.productVariantId;
     final facilityId = state.facilityModel?.id;
-    final dateOfReconciliation = state.dateOfReconciliation;
 
-    if (productVariantId == null || facilityId == null) return;
+    if ((productVariantId == null) ||
+        (!event.isDistributor && facilityId == null)) return;
 
-    final stocks = await stockRepository.search(
+    final user = await LocalSecureStore.instance.userRequestModel;
+
+    final receivedStocks = (await stockRepository.search(
       StockSearchModel(
         productVariantId: productVariantId,
-        facilityId: facilityId,
+        receiverId: facilityId,
       ),
-    );
-
-    final dateFilteredStocks = stocks
-        .where(
-          (e) =>
-              e.dateOfEntryTime!.year < dateOfReconciliation.year ||
-              e.dateOfEntryTime!.year == dateOfReconciliation.year &&
-                  e.dateOfEntryTime!.month < dateOfReconciliation.month ||
-              e.dateOfEntryTime!.year == dateOfReconciliation.year &&
-                  e.dateOfEntryTime!.month == dateOfReconciliation.month &&
-                  e.dateOfEntryTime!.day <= dateOfReconciliation.day,
-        )
+    ))
+        .where((element) =>
+            element.auditDetails != null &&
+            element.auditDetails?.createdBy == user?.uuid)
+        .toList();
+    final sentStocks = (await stockRepository.search(
+      StockSearchModel(
+        productVariantId: productVariantId,
+        senderId: facilityId,
+      ),
+    ))
+        .where((element) =>
+            element.auditDetails != null &&
+            element.auditDetails?.createdBy == user?.uuid)
         .toList();
 
-    emit(state.copyWith(loading: false, stockModels: dateFilteredStocks));
+    emit(state.copyWith(
+      loading: false,
+      stockModels: [...receivedStocks, ...sentStocks],
+    ));
   }
 
   FutureOr<void> _handleCreate(
@@ -104,7 +105,6 @@ class StockReconciliationBloc
             AdditionalField('issued', state.stockIssued),
             AdditionalField('returned', state.stockReturned),
             AdditionalField('lost', state.stockLost),
-            AdditionalField('gained', state.stockGained),
             AdditionalField('damaged', state.stockDamaged),
             AdditionalField('inHand', state.stockInHand),
           ],
@@ -124,19 +124,18 @@ class StockReconciliationBloc
 @freezed
 class StockReconciliationEvent with _$StockReconciliationEvent {
   const factory StockReconciliationEvent.selectFacility(
-    FacilityModel facilityModel,
-  ) = StockReconciliationSelectFacilityEvent;
+    FacilityModel facilityModel, {
+    @Default(false) bool isDistributor,
+  }) = StockReconciliationSelectFacilityEvent;
 
   const factory StockReconciliationEvent.selectProduct(
-    String? productVariantId,
-  ) = StockReconciliationSelectProductEvent;
+    String? productVariantId, {
+    @Default(false) bool isDistributor,
+  }) = StockReconciliationSelectProductEvent;
 
-  const factory StockReconciliationEvent.selectDateOfReconciliation(
-    DateTime? dateOfReconciliation,
-  ) = StockReconciliationSelectDateOfReconciliationEvent;
-
-  const factory StockReconciliationEvent.calculate() =
-      StockReconciliationCalculateEvent;
+  const factory StockReconciliationEvent.calculate({
+    @Default(false) bool isDistributor,
+  }) = StockReconciliationCalculateEvent;
 
   const factory StockReconciliationEvent.create(
     StockReconciliationModel stockReconciliationModel,
@@ -183,13 +182,6 @@ class StockReconciliationState with _$StockReconciliationState {
                 e.transactionReason == TransactionReason.lostInStorage)),
       );
 
-  num get stockGained => _getQuantityCount(
-        stockModels.where((e) =>
-            e.transactionType == TransactionType.received &&
-            (e.transactionReason == TransactionReason.gainedInStorage ||
-                e.transactionReason == TransactionReason.gainedInTransit)),
-      );
-
   num get stockDamaged => _getQuantityCount(
         stockModels.where((e) =>
             e.transactionType == TransactionType.dispatched &&
@@ -198,7 +190,7 @@ class StockReconciliationState with _$StockReconciliationState {
       );
 
   num get stockInHand =>
-      (stockReceived + stockReturned + stockGained) -
+      (stockReceived + stockReturned) -
       (stockIssued + stockDamaged + stockLost);
 
   num _getQuantityCount(Iterable<StockModel> stocks) {

@@ -26,33 +26,58 @@ extension ContextUtilityExtensions on BuildContext {
 
   String get projectId => selectedProject.id;
 
-  int get maximumQuantity {
-    int totalNumber = 0;
-    List<TargetModel> filterData = selectedProject.targets!
-        .where(
-          (element) => element.beneficiaryType == BeneficiaryType.individual,
-        )
-        .toList();
-
-    totalNumber =
-        filterData.isNotEmpty ? filterData.first.totalNo!.toInt() : 10000;
-
-    int expectedCount = (totalNumber * 1.3) ~/ 2;
-
-    return expectedCount;
-  }
-
   Cycle get selectedCycle {
     final projectBloc = _get<ProjectBloc>();
 
     final projectState = projectBloc.state;
-    final selectedCycle = projectState.selectedCycle;
+    final selectedCycle = projectState.projectType?.cycles
+        ?.where(
+          (e) =>
+              (e.startDate!) < DateTime.now().millisecondsSinceEpoch &&
+              (e.endDate!) > DateTime.now().millisecondsSinceEpoch,
+          // Return null when no matching cycle is found
+        )
+        .firstOrNull;
 
     if (selectedCycle == null) {
       return const Cycle();
     }
 
     return selectedCycle;
+  }
+
+  ProjectType? get selectedProjectType {
+    final projectBloc = _get<ProjectBloc>();
+
+    final projectState = projectBloc.state;
+    final projectType = projectState.projectType;
+
+    if (selectedCycle == null) {
+      return null;
+    }
+
+    return projectType;
+  }
+
+  List<String> get cycles {
+    final projectBloc = _get<ProjectBloc>();
+
+    final projectState = projectBloc.state;
+
+    if (projectState.projectType?.cycles != null &&
+        (projectState.projectType?.cycles?.length ?? 0) > 0) {
+      List<String> resultList = [];
+
+      for (int i = 1;
+          i <= (projectState.projectType?.cycles?.length ?? 0);
+          i++) {
+        resultList.add('0${i.toString()}');
+      }
+
+      return resultList;
+    } else {
+      return [];
+    }
   }
 
   BoundaryModel get boundary {
@@ -76,11 +101,8 @@ extension ContextUtilityExtensions on BuildContext {
 
     final projectState = projectBloc.state;
 
-    final BeneficiaryType selectedBeneficiary =
-        projectState.projectType?.beneficiaryType ==
-                BeneficiaryType.household.toValue()
-            ? BeneficiaryType.household
-            : BeneficiaryType.individual;
+    final BeneficiaryType? selectedBeneficiary =
+        projectState.selectedProject?.targets?.firstOrNull?.beneficiaryType;
 
     if (selectedBeneficiary == null) {
       throw AppException('No beneficiary type is selected');
@@ -97,46 +119,10 @@ extension ContextUtilityExtensions on BuildContext {
     }
   }
 
-  bool get isDownSyncEnabled {
-    try {
-      bool isDownSyncEnabled = loggedInUserRoles
-          .where(
-            (role) =>
-                role.code == RolesType.distributor.toValue() ||
-                role.code == RolesType.registrar.toValue(),
-          )
-          .toList()
-          .isNotEmpty;
-
-      return isDownSyncEnabled;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  bool get isAllBoundaryMandatory {
-    try {
-      bool isAllBoundaryMandatory = loggedInUserRoles
-          .where(
-            (role) =>
-                role.code == RolesType.distributor.toValue() ||
-                role.code == RolesType.registrar.toValue() ||
-                role.code == RolesType.supervisor.toValue() ||
-                role.code == RolesType.nationalSupervisor.toValue(),
-          )
-          .toList()
-          .isNotEmpty;
-
-      return isAllBoundaryMandatory;
-    } catch (_) {
-      return false;
-    }
-  }
-
   List<UserRoleModel> get loggedInUserRoles {
     final authBloc = _get<AuthBloc>();
     final userRequestObject = authBloc.state.whenOrNull(
-      authenticated: (accessToken, refreshToken, userModel, actionsWrapper, individualId) {
+      authenticated: (accessToken, refreshToken, userModel, actionsWrapper) {
         return userModel.roles;
       },
     );
@@ -148,30 +134,12 @@ extension ContextUtilityExtensions on BuildContext {
     return userRequestObject;
   }
 
-    String? get loggedInIndividualId {
-    final authBloc = _get<AuthBloc>();
-    final individualUUID = authBloc.state.whenOrNull(
-      authenticated:
-          (accessToken, refreshToken, userModel, actionsWrapper, individualId) {
-        return individualId;
-      },
-    );
-
-    if (individualUUID == null) {
-      return null;
-    }
-
-    return individualUUID;
-  }
-
-
-
   String get loggedInUserUuid => loggedInUser.uuid;
 
   UserRequestModel get loggedInUser {
     final authBloc = _get<AuthBloc>();
     final userRequestObject = authBloc.state.whenOrNull(
-      authenticated: (accessToken, refreshToken, userModel, actions, individualId) {
+      authenticated: (accessToken, refreshToken, userModel, actions) {
         return userModel;
       },
     );
@@ -195,28 +163,7 @@ extension ContextUtilityExtensions on BuildContext {
     for (final role in loggedInUser.roles) {
       switch (role.code) {
         case "REGISTRAR":
-        case "COMMUNITY_DISTRIBUTOR":
-          return true;
-        default:
-          break;
-      }
-    }
-
-    return false;
-  }
-
-  bool get isRegistrar {
-    UserRequestModel loggedInUser;
-
-    try {
-      loggedInUser = this.loggedInUser;
-    } catch (_) {
-      return false;
-    }
-
-    for (final role in loggedInUser.roles) {
-      switch (role.code) {
-        case "REGISTRAR":
+        case "DISTRIBUTOR":
           return true;
         default:
           break;
@@ -244,20 +191,5 @@ extension ContextUtilityExtensions on BuildContext {
     } catch (error) {
       throw AppException('Could not fetch ${T.runtimeType}');
     }
-  }
-
-// to check  logged in user is isWarehouseManager or not
-  bool get isWarehouseManager {
-    final authState = _get<AuthBloc>().state;
-
-    if (authState is! AuthAuthenticatedState) {
-      return false;
-    }
-
-    final roles = authState.userModel.roles.map((e) {
-      return e.code;
-    });
-
-    return roles.contains("WAREHOUSE_MANAGER");
   }
 }
