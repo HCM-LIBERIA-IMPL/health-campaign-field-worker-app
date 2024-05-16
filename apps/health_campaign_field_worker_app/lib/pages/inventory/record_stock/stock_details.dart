@@ -601,6 +601,14 @@ class _StockDetailsPageState extends LocalizedState<StockDetailsPage> {
                                               );
 
                                               if (submit ?? false) {
+                                                final scannerbloc =
+                                                    context.read<ScannerBloc>();
+
+                                                scannerbloc.add(
+                                                  const ScannerEvent
+                                                      .handleScanner([], []),
+                                                );
+
                                                 bloc.add(
                                                   const RecordStockCreateStockEntryEvent(),
                                                 );
