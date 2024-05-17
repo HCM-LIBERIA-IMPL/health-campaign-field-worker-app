@@ -374,7 +374,7 @@ class IndividualLocalRepository extends IndividualLocalBaseRepository {
           clientAuditDetails: entity.clientAuditDetails,
         )
         .companion;
-        
+
     final addressCompanions = entity.address?.map((e) {
           return e
               .copyWith(
